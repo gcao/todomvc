@@ -23,14 +23,15 @@ Todos.prototype.clearCompleted = ->
     if @[i].completed
       @splice i, 1
 
-Todos.prototype.filterBy = (@_filterBy) ->
+Todos.prototype.filterBy = (filter) ->
+  if ['all', 'active', 'completed'].indexOf(filter) >= 0
+    @_filter = filter
+  else
+    console.log "Filter is not supported: '#{filter}'"
+    return
+
   @el.find('#filters a').removeClass('selected')
-  if @_filterBy is 'active'
-    @el.find('li.active a').addClass('selected')
-  else if @_filterBy is 'completed'
-    @el.find('li.completed a').addClass('selected')
-  else if not @_filterBy
-    @el.find('li.all a').addClass('selected')
+  @el.find("li.#{@_filter} a").addClass('selected')
 
   @updateUI()
 
@@ -48,9 +49,9 @@ Todos.prototype.updateFooter = ->
 
 Todos.prototype.renderChildren = ->
   for todo in @
-    if @_filterBy is 'active' and todo.completed
+    if @_filter is 'active' and todo.completed
       continue
-    else if @_filterBy is 'completed' and !todo.completed
+    else if @_filter is 'completed' and !todo.completed
       continue
     else
       todo.render()

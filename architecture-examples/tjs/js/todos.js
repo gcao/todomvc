@@ -51,16 +51,15 @@
     return _results;
   };
 
-  Todos.prototype.filterBy = function(_filterBy) {
-    this._filterBy = _filterBy;
-    this.el.find('#filters a').removeClass('selected');
-    if (this._filterBy === 'active') {
-      this.el.find('li.active a').addClass('selected');
-    } else if (this._filterBy === 'completed') {
-      this.el.find('li.completed a').addClass('selected');
-    } else if (!this._filterBy) {
-      this.el.find('li.all a').addClass('selected');
+  Todos.prototype.filterBy = function(filter) {
+    if (['all', 'active', 'completed'].indexOf(filter) >= 0) {
+      this._filter = filter;
+    } else {
+      console.log("Filter is not supported: '" + filter + "'");
+      return;
     }
+    this.el.find('#filters a').removeClass('selected');
+    this.el.find("li." + this._filter + " a").addClass('selected');
     return this.updateUI();
   };
 
@@ -86,9 +85,9 @@
     _results = [];
     for (_i = 0, _len = this.length; _i < _len; _i++) {
       todo = this[_i];
-      if (this._filterBy === 'active' && todo.completed) {
+      if (this._filter === 'active' && todo.completed) {
         continue;
-      } else if (this._filterBy === 'completed' && !todo.completed) {
+      } else if (this._filter === 'completed' && !todo.completed) {
         continue;
       } else {
         _results.push(todo.render());

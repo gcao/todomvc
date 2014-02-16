@@ -20,7 +20,7 @@
   router = new routes();
 
   router.get('/', function() {
-    return todos.filterBy();
+    return todos.filterBy('all');
   });
 
   router.get('/:filter', function(req) {

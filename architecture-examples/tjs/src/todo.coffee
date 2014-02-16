@@ -4,25 +4,16 @@ class @Todo
     watch @, 'title', ->
       self.el.find('label').html(self.title)
     watch @, 'completed', ->
-      self.updateStatus()
+      @el.find('.toggle').attr('checked', @completed)
 
   watchIgnore: ['parent', 'el', 'input']
 
-  updateStatus: ->
-    if @completed
-      @el.find('.toggle').attr('checked', 'checked')
-    else
-      @el.find('.toggle').removeAttr('checked')
-
   close: ->
-    unless @el.hasClass('editing')
-      return
-
-    trimmedValue = @input.val().trim()
-    if trimmedValue
-      @title = trimmedValue
-
+    return if not @el.hasClass('editing')
     @el.removeClass('editing')
+
+    if trimmedValue = @input.val().trim()
+      @title = trimmedValue
 
   render: ->
     self = @

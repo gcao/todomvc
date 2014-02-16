@@ -11,30 +11,21 @@
         return self.el.find('label').html(self.title);
       });
       watch(this, 'completed', function() {
-        return self.updateStatus();
+        return this.el.find('.toggle').attr('checked', this.completed);
       });
     }
 
     Todo.prototype.watchIgnore = ['parent', 'el', 'input'];
-
-    Todo.prototype.updateStatus = function() {
-      if (this.completed) {
-        return this.el.find('.toggle').attr('checked', 'checked');
-      } else {
-        return this.el.find('.toggle').removeAttr('checked');
-      }
-    };
 
     Todo.prototype.close = function() {
       var trimmedValue;
       if (!this.el.hasClass('editing')) {
         return;
       }
-      trimmedValue = this.input.val().trim();
-      if (trimmedValue) {
-        this.title = trimmedValue;
+      this.el.removeClass('editing');
+      if (trimmedValue = this.input.val().trim()) {
+        return this.title = trimmedValue;
       }
-      return this.el.removeClass('editing');
     };
 
     Todo.prototype.render = function() {

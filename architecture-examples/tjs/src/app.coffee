@@ -10,6 +10,6 @@ watch @, 'todos', ->
   todos.updateUI()
 
 router = new routes()
-router.get '/'       ,       -> todos.filterBy()
+router.get '/'       ,       -> todos.filterBy('all')
 router.get '/:filter', (req) -> todos.filterBy(req.params.filter)
 
