@@ -1,12 +1,12 @@
-this.ENTER_KEY = 13
-this.ESC_KEY   = 27
+@ENTER_KEY = 13
+@ESC_KEY   = 27
 
-this.todos = Todos.load('todos')
+@todos = todos = TodosResource.load('todos')
 
-T(todos.render()).render inside: '#todoapp'
+T(@todos.render()).render inside: '#todoapp'
 
-watch this, 'todos', ->
-  todos.save()
+watch @, 'todos', ->
+  TodosResource.save('todos', todos)
   todos.updateUI()
 
 router = new routes()

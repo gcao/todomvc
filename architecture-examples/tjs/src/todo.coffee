@@ -1,4 +1,4 @@
-class this.Todo
+class @Todo
   constructor: (@parent, @title, @completed) ->
     self = @
     watch @, 'title', ->

@@ -1,35 +1,10 @@
-this.Todos = (args...) ->
+@Todos = Todos = (args...) ->
   @push arg for arg in args
   return
 
 Todos.prototype = new Array
 
 Todos.prototype.watchIgnore = ['el']
-
-Todos.prototype.serialize = ->
-  data = []
-  for item in @
-    data.push title: item.title, completed: item.completed
-
-  JSON.stringify(data)
-
-Todos.deserialize = (str) ->
-  result = new Todos
-
-  if str
-    if data = JSON.parse str
-      for item in data
-        result.push new Todo(result, item.title, item.completed)
-
-  result
-
-Todos.load = (id) ->
-  todos = @deserialize localStorage.getItem(id)
-  todos.id = id
-  todos
-
-Todos.prototype.save = ->
-  localStorage.setItem(@id, @serialize())
 
 Todos.prototype.remaining = ->
   @filter (item) -> !item.completed
@@ -49,16 +24,27 @@ Todos.prototype.clearCompleted = ->
       @splice i, 1
 
 Todos.prototype.filterBy = (@_filterBy) ->
-  @updateChildren()
+  @el.find('#filters a').removeClass('selected')
+  if @_filterBy is 'active'
+    @el.find('li.active a').addClass('selected')
+  else if @_filterBy is 'completed'
+    @el.find('li.completed a').addClass('selected')
+  else if not @_filterBy
+    @el.find('li.all a').addClass('selected')
+
+  @updateUI()
 
 Todos.prototype.updateUI = ->
-  if @el
-    @updateChildren()
-    @updateRemaining()
-    @updateCompleted()
+  @updateChildren()
+  @updateFooter()
 
 Todos.prototype.updateChildren = ->
   T(@renderChildren()).render inside: @el.find('#todo-list')
+
+Todos.prototype.updateFooter = ->
+  @el.find('#footer').toggle(@length > 0)
+  @updateRemaining()
+  @updateCompleted()
 
 Todos.prototype.renderChildren = ->
   for todo in @
@@ -79,12 +65,13 @@ Todos.prototype.renderRemaining = ->
   ]
 
 Todos.prototype.updateCompleted = ->
+  @el.find('#clear-completed').toggle(@completed() > 0)
   T(@renderCompleted()).render inside: @el.find('#clear-completed span')
 
 Todos.prototype.renderCompleted = ->
   [ 'span'
     'Clear completed '
-    if @completed() > 0 then @completed() else ''
+    @completed()
   ]
 
 Todos.prototype.render = ->
@@ -119,10 +106,14 @@ Todos.prototype.render = ->
     [ 'footer#footer'
       @renderRemaining()
       [ 'ul#filters'
-        [ 'li'
-          [ 'a', href: '#/', 'All' ]
-          [ 'a', href: '#/active', 'Active' ]
-          [ 'a', href: '#/completed', 'Completed' ]
+        [ 'li.all'
+          [ 'a', href: '#/', 'All']
+        ]
+        [ 'li.active'
+          [ 'a', href: '#/active', 'Active']
+        ]
+        [ 'li.completed'
+          [ 'a', href: '#/completed', 'Completed']
         ]
       ]
       [ 'button#clear-completed'
