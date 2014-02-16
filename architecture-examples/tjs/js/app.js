@@ -13,7 +13,6 @@
   });
 
   watch(this, 'todos', function() {
-    console.log('watch this.todos handler');
     todos.save();
     return todos.updateUI();
   });

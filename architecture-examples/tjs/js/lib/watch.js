@@ -33,6 +33,10 @@
         var printedObjectKeys = [];
 
         function printOnceReplacer(key, value){
+            if (obj && obj.watchIgnore && obj.watchIgnore.indexOf(key) >= 0) {
+                return;
+            }
+
             var printedObjIndex = false;
             printedObjects.forEach(function(obj, index){
                 if (obj===value) {

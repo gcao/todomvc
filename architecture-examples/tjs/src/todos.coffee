@@ -1,11 +1,5 @@
 this.Todos = (args...) ->
   @push arg for arg in args
-
-  #watch @, =>
-  #  console.log 'Todos watch handler'
-  #  @save()
-  #  @updateUI()
-
   return
 
 Todos.prototype = new Array
@@ -55,16 +49,7 @@ Todos.prototype.clearCompleted = ->
       @splice i, 1
 
 Todos.prototype.filterBy = (@_filterBy) ->
-  T(@renderChildren()).render inside: '#todo-list'
-
-Todos.prototype.renderChildren = ->
-  for todo in @
-    if @_filterBy is 'active' and todo.completed
-      continue
-    else if @_filterBy is 'completed' and !todo.completed
-      continue
-    else
-      todo.render()
+  @updateChildren()
 
 Todos.prototype.updateUI = ->
   if @el
@@ -74,6 +59,15 @@ Todos.prototype.updateUI = ->
 
 Todos.prototype.updateChildren = ->
   T(@renderChildren()).render inside: @el.find('#todo-list')
+
+Todos.prototype.renderChildren = ->
+  for todo in @
+    if @_filterBy is 'active' and todo.completed
+      continue
+    else if @_filterBy is 'completed' and !todo.completed
+      continue
+    else
+      todo.render()
 
 Todos.prototype.updateRemaining = ->
   T(@renderRemaining()).render replace: @el.find('#todo-count')
@@ -85,7 +79,13 @@ Todos.prototype.renderRemaining = ->
   ]
 
 Todos.prototype.updateCompleted = ->
-  @el.find('#clear-completed span').text(@completed())
+  T(@renderCompleted()).render inside: @el.find('#clear-completed span')
+
+Todos.prototype.renderCompleted = ->
+  [ 'span'
+    'Clear completed '
+    if @completed() > 0 then @completed() else ''
+  ]
 
 Todos.prototype.render = ->
   self = @
@@ -127,10 +127,7 @@ Todos.prototype.render = ->
       ]
       [ 'button#clear-completed'
         click: -> self.clearCompleted()
-        'Clear completed '
-        [ 'span'
-          if @length > 0 then @length else ''
-        ]
+        @renderCompleted()
       ]
     ]
   ]

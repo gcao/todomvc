@@ -6,7 +6,6 @@ this.todos = Todos.load('todos')
 T(todos.render()).render inside: '#todoapp'
 
 watch this, 'todos', ->
-  console.log 'watch this.todos handler'
   todos.save()
   todos.updateUI()
 

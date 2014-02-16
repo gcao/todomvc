@@ -90,8 +90,20 @@
 
   Todos.prototype.filterBy = function(_filterBy) {
     this._filterBy = _filterBy;
+    return this.updateChildren();
+  };
+
+  Todos.prototype.updateUI = function() {
+    if (this.el) {
+      this.updateChildren();
+      this.updateRemaining();
+      return this.updateCompleted();
+    }
+  };
+
+  Todos.prototype.updateChildren = function() {
     return T(this.renderChildren()).render({
-      inside: '#todo-list'
+      inside: this.el.find('#todo-list')
     });
   };
 
@@ -111,20 +123,6 @@
     return _results;
   };
 
-  Todos.prototype.updateUI = function() {
-    if (this.el) {
-      this.updateChildren();
-      this.updateRemaining();
-      return this.updateCompleted();
-    }
-  };
-
-  Todos.prototype.updateChildren = function() {
-    return T(this.renderChildren()).render({
-      inside: this.el.find('#todo-list')
-    });
-  };
-
   Todos.prototype.updateRemaining = function() {
     return T(this.renderRemaining()).render({
       replace: this.el.find('#todo-count')
@@ -136,7 +134,13 @@
   };
 
   Todos.prototype.updateCompleted = function() {
-    return this.el.find('#clear-completed span').text(this.completed());
+    return T(this.renderCompleted()).render({
+      inside: this.el.find('#clear-completed span')
+    });
+  };
+
+  Todos.prototype.renderCompleted = function() {
+    return ['span', 'Clear completed ', this.completed() > 0 ? this.completed() : ''];
   };
 
   Todos.prototype.render = function() {
@@ -196,7 +200,7 @@
             click: function() {
               return self.clearCompleted();
             }
-          }, 'Clear completed ', ['span', this.length > 0 ? this.length : '']
+          }, this.renderCompleted()
         ]
       ]
     ];
