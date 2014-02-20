@@ -1,36 +1,34 @@
-class @Todo
-  constructor: (@parent, @title, @completed = false) ->
-
-  watchIgnore: ['parent', 'el', 'input']
+class @TodoView
+  constructor: (@todos, @todo) ->
 
   close: ->
     return if not @el.hasClass('editing')
     @el.removeClass('editing')
 
     if trimmedValue = @input.val().trim()
-      @title = trimmedValue
+      @todo.title = trimmedValue
 
-  render: ->
+  process: ->
     self = @
     [ 'li'
       afterRender: (el) ->
         self.el = $(el)
         runThenWatch @, 'title', ->
-          self.el.find('label').html(self.title)
+          self.el.find('label').html(self.todo.title)
         runThenWatch @, 'completed', ->
-          self.el.toggleClass('completed', self.completed)
-          self.el.find('.toggle').attr('checked', self.completed)
+          self.el.toggleClass('completed', self.todo.completed)
+          self.el.find('.toggle').attr('checked', self.todo.completed)
       [ '.view'
         dblclick: ->
           self.el.addClass('editing')
           self.input.focus()
         [ 'input.toggle'
           type: 'checkbox'
-          click: -> self.completed = !self.completed
+          click: -> self.todo.completed = !self.todo.completed
         ]
         [ 'label', @title ]
         [ 'button.destroy'
-          click: -> self.parent.splice self.parent.indexOf(self), 1
+          click: -> self.todos.splice self.todos.indexOf(self.todo), 1
         ]
       ]
       [ 'input.edit'
@@ -41,7 +39,7 @@ class @Todo
             self.close()
         keydown: (e) ->
           if e.which is ESC_KEY
-            $(@).val(self.title)
+            $(@).val(self.todo.title)
             self.el.removeClass('editing')
         blur: -> self.close()
       ]

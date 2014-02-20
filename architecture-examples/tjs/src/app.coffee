@@ -1,20 +1,17 @@
-@ENTER_KEY = 13
-@ESC_KEY   = 27
+# Load initial data
+@todos = TodosResource.load('todos')
 
-@todos = todos = TodosResource.load('todos')
+# Render TODOs
+todosView = new TodosView(@todos)
+todosView.render inside: '#todoapp'
 
-T(@todos.render()).render inside: '#todoapp'
-
+# Respond to changes
 watch @, 'todos', ->
   TodosResource.save('todos', todos)
-  todos.updateUI()
+  todosView.updateUI()
 
+# Router
 router = new routes()
-router.get '/'       ,       -> todos.filterBy('all')
-router.get '/:filter', (req) -> todos.filterBy(req.params.filter)
-
-# Utility functions
-@runThenWatch = (obj, properties, callback) ->
-  callback()
-  watch(obj, properties, callback)
+router.get '/'       ,       -> todosView.filterBy('all')
+router.get '/:filter', (req) -> todosView.filterBy(req.params.filter)
 
