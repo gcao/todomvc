@@ -2,17 +2,9 @@
 (function() {
   this.Todo = (function() {
     function Todo(parent, title, completed) {
-      var self;
       this.parent = parent;
       this.title = title;
-      this.completed = completed;
-      self = this;
-      watch(this, 'title', function() {
-        return self.el.find('label').html(self.title);
-      });
-      watch(this, 'completed', function() {
-        return this.el.find('.toggle').attr('checked', this.completed);
-      });
+      this.completed = completed != null ? completed : false;
     }
 
     Todo.prototype.watchIgnore = ['parent', 'el', 'input'];
@@ -34,7 +26,14 @@
       return [
         'li', {
           afterRender: function(el) {
-            return self.el = $(el);
+            self.el = $(el);
+            runThenWatch(this, 'title', function() {
+              return self.el.find('label').html(self.title);
+            });
+            return runThenWatch(this, 'completed', function() {
+              self.el.toggleClass('completed', self.completed);
+              return self.el.find('.toggle').attr('checked', self.completed);
+            });
           }
         }, [
           '.view', {
@@ -44,10 +43,7 @@
             }
           }, [
             'input.toggle', {
-              type: 'checkbox'
-            }, this.completed ? {
-              checked: 'checked'
-            } : void 0, {
+              type: 'checkbox',
               click: function() {
                 return self.completed = !self.completed;
               }
@@ -72,6 +68,7 @@
             },
             keydown: function(e) {
               if (e.which === ESC_KEY) {
+                $(this).val(self.title);
                 return self.el.removeClass('editing');
               }
             },

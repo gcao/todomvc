@@ -13,3 +13,8 @@ router = new routes()
 router.get '/'       ,       -> todos.filterBy('all')
 router.get '/:filter', (req) -> todos.filterBy(req.params.filter)
 
+# Utility functions
+@runThenWatch = (obj, properties, callback) ->
+  callback()
+  watch(obj, properties, callback)
+

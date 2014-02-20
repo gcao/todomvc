@@ -27,4 +27,9 @@
     return todos.filterBy(req.params.filter);
   });
 
+  this.runThenWatch = function(obj, properties, callback) {
+    callback();
+    return watch(obj, properties, callback);
+  };
+
 }).call(this);
