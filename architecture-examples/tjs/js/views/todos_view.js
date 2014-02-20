@@ -41,11 +41,10 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         todo = _ref[_i];
-        if ((this.filter === 'active' && !todo.completed) || (this.filter === 'completed' && todo.completed)) {
-          _results.push(new TodoView(todos, todo).process());
-        } else {
-          _results.push(void 0);
+        if ((this.filter === 'active' && todo.completed) || (this.filter === 'completed' && !todo.completed)) {
+          continue;
         }
+        _results.push(new TodoView(this.todos, todo).process());
       }
       return _results;
     };

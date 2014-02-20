@@ -26,8 +26,10 @@ class @TodosView
 
   childrenView: ->
     for todo in @todos
-      if (@filter is 'active' and not todo.completed) or (@filter is 'completed' and todo.completed)
-        new TodoView(todos, todo).process()
+      if (@filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
+        continue
+
+      new TodoView(@todos, todo).process()
 
   updateRemaining: ->
     T(@remainingView()).render replace: @el.find('#todo-count')
