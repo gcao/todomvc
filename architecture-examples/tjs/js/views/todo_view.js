@@ -24,13 +24,9 @@
         'li', {
           afterRender: function(el) {
             self.el = $(el);
-            runThenWatch(this, 'title', function() {
-              return self.el.find('label').html(self.todo.title);
-            });
-            return runThenWatch(this, 'completed', function() {
-              self.el.toggleClass('completed', self.todo.completed);
-              return self.el.find('.toggle').attr('checked', self.todo.completed);
-            });
+            self.el.find('label').html(self.todo.title);
+            self.el.toggleClass('completed', self.todo.completed);
+            return self.el.find('.toggle').attr('checked', self.todo.completed);
           }
         }, [
           '.view', {

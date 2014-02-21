@@ -2,13 +2,8 @@
 @ENTER_KEY = 13
 @ESC_KEY   = 27
 
-# Events
 @TODOS_CHANGED = 'todos_changed'
 
-# Utility functions
-@runThenWatch = (obj, properties, callback) ->
-  callback()
-  watch(obj, properties, callback)
 
 # A tiny pubsub
 # https://github.com/cowboy/jquery-tiny-pubsub/blob/master/src/tiny-pubsub.js

@@ -13,11 +13,9 @@ class @TodoView
     [ 'li'
       afterRender: (el) ->
         self.el = $(el)
-        runThenWatch @, 'title', ->
-          self.el.find('label').html(self.todo.title)
-        runThenWatch @, 'completed', ->
-          self.el.toggleClass('completed', self.todo.completed)
-          self.el.find('.toggle').attr('checked', self.todo.completed)
+        self.el.find('label').html(self.todo.title)
+        self.el.toggleClass('completed', self.todo.completed)
+        self.el.find('.toggle').attr('checked', self.todo.completed)
       [ '.view'
         dblclick: ->
           self.el.addClass('editing')

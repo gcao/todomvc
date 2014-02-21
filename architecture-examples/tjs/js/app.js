@@ -4,13 +4,13 @@
 
   this.todos = TodosResource.load('todos');
 
-  watch(this, 'todos', (function() {
-    return $.publish(TODOS_CHANGED);
-  }), 1);
-
   $.subscribe(TODOS_CHANGED, function() {
     return TodosResource.save('todos', todos);
   });
+
+  watch(this, 'todos', (function() {
+    return $.publish(TODOS_CHANGED);
+  }), 1);
 
   todosView = new TodosView(todos);
 

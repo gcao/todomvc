@@ -9,10 +9,9 @@ class @TodosResource
   deserialize = (str) ->
     result = new Todos
 
-    if str
-      if data = JSON.parse str
-        for item in data
-          result.push new Todo(item.title, item.completed)
+    if str and data = JSON.parse(str)
+      for item in data
+        result.push new Todo(item.title, item.completed)
 
     result
 

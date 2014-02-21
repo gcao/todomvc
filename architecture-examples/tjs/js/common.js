@@ -8,11 +8,6 @@
 
   this.TODOS_CHANGED = 'todos_changed';
 
-  this.runThenWatch = function(obj, properties, callback) {
-    callback();
-    return watch(obj, properties, callback);
-  };
-
   o = $({});
 
   $.subscribe = function() {
