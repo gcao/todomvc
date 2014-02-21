@@ -4,15 +4,18 @@
 
   this.todos = TodosResource.load('todos');
 
-  todosView = new TodosView(this.todos);
+  watch(this, 'todos', (function() {
+    return $.publish(TODOS_CHANGED);
+  }), 1);
+
+  $.subscribe(TODOS_CHANGED, function() {
+    return TodosResource.save('todos', todos);
+  });
+
+  todosView = new TodosView(todos);
 
   todosView.render({
     inside: '#todoapp'
-  });
-
-  watch(this, 'todos', function() {
-    TodosResource.save('todos', todos);
-    return todosView.updateUI();
   });
 
   router = new routes();

@@ -1,5 +1,6 @@
 class @TodosView
   constructor: (@todos) ->
+    $.subscribe TODOS_CHANGED, => @updateUI()
 
   filterBy: (filter) ->
     if ['all', 'active', 'completed'].indexOf(filter) < 0
