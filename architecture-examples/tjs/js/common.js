@@ -8,6 +8,28 @@
 
   this.TODOS_CHANGED = 'todos_changed';
 
+  this.bind = function(el, obj, props, options) {
+    var callback, tagName;
+    if (options.callback) {
+      options.callback(el, obj, properties);
+    }
+    tagName = $(el).get(0).tagName;
+    if (tagName === 'INPUT') {
+      $(el).change(function() {
+        return obj[props] = $(this).val();
+      });
+    }
+    callback = options.callback || function() {
+      if (tagName === 'INPUT') {
+        return $(el).val(obj[props]);
+      } else {
+        return $(el).text(obj[props]);
+      }
+    };
+    callback();
+    return watch(obj, props, callback, 1);
+  };
+
   o = $({});
 
   $.subscribe = function() {

@@ -29,6 +29,12 @@
     };
 
     TodosView.prototype.updateChildren = function() {
+      var child, _i, _len, _ref;
+      _ref = this.children;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        child = _ref[_i];
+        child.destroy();
+      }
       return T(this.childrenView()).render({
         inside: this.el.find('#todo-list')
       });
@@ -41,7 +47,8 @@
     };
 
     TodosView.prototype.childrenView = function() {
-      var todo, _i, _len, _ref, _results;
+      var child, todo, _i, _len, _ref, _results;
+      this.children = [];
       _ref = this.todos;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -49,30 +56,21 @@
         if ((this.filter === 'active' && todo.completed) || (this.filter === 'completed' && !todo.completed)) {
           continue;
         }
-        _results.push(new TodoView(this.todos, todo).process());
+        child = new TodoView(this.todos, todo);
+        this.children.push(child);
+        _results.push(child.process());
       }
       return _results;
     };
 
     TodosView.prototype.updateRemaining = function() {
-      return T(this.remainingView()).render({
-        replace: this.el.find('#todo-count')
-      });
-    };
-
-    TodosView.prototype.remainingView = function() {
-      return ['span#todo-count', ['strong', this.todos.remaining()], " item" + (this.todos.remaining() > 1 ? 's' : '') + " left"];
+      this.el.find('#todo-count strong').text(this.todos.remaining());
+      return this.el.find('#todo-count .plural').toggle(this.todos.remaining() > 1);
     };
 
     TodosView.prototype.updateCompleted = function() {
       this.el.find('#clear-completed').toggle(this.todos.completed() > 0);
-      return T(this.completedView()).render({
-        inside: this.el.find('#clear-completed span')
-      });
-    };
-
-    TodosView.prototype.completedView = function() {
-      return ['span', 'Clear completed ', this.todos.completed()];
+      return this.el.find('.completed-value').text(this.todos.completed());
     };
 
     TodosView.prototype.process = function() {
@@ -111,7 +109,13 @@
             }, 'Mark all as complete'
           ], ['ul#todo-list', this.childrenView()]
         ], [
-          'footer#footer', this.remainingView(), [
+          'footer#footer', [
+            'span#todo-count', ['strong', this.todos.remaining()], " item", [
+              'span.plural', this.todos.remaining() <= 1 ? {
+                display: 'none'
+              } : void 0, 's'
+            ], " left"
+          ], [
             'ul#filters', [
               'li.all', [
                 'a', {
@@ -136,7 +140,7 @@
               click: function() {
                 return self.todos.clearCompleted();
               }
-            }, this.completedView()
+            }, ['span', 'Clear completed (', ['span.completed-value', this.todos.completed()], ')']
           ]
         ]
       ];

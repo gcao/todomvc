@@ -1,5 +1,12 @@
 class @TodoView
   constructor: (@todos, @todo) ->
+    $.subscribe TODOS_CHANGED, @todosChangedHandler
+
+  destroy: ->
+    $.unsubscribe TODOS_CHANGED, @todosChangedHandler
+
+  todosChangedHandler: =>
+    console.log TODOS_CHANGED + ' ' + @todo.title
 
   close: ->
     return if not @el.hasClass('editing')

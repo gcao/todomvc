@@ -18,6 +18,8 @@ class @TodosView
     @updateFooter()
 
   updateChildren: ->
+    child.destroy() for child in @children
+
     T(@childrenView()).render inside: @el.find('#todo-list')
 
   updateFooter: ->
@@ -26,30 +28,22 @@ class @TodosView
     @updateCompleted()
 
   childrenView: ->
+    @children = []
     for todo in @todos
       if (@filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
         continue
 
-      new TodoView(@todos, todo).process()
+      child = new TodoView(@todos, todo)
+      @children.push child
+      child.process()
 
   updateRemaining: ->
-    T(@remainingView()).render replace: @el.find('#todo-count')
-
-  remainingView: ->
-    [ 'span#todo-count'
-      [ 'strong', @todos.remaining() ]
-      " item#{if @todos.remaining() > 1 then 's' else '' } left"
-    ]
+    @el.find('#todo-count strong').text(@todos.remaining())
+    @el.find('#todo-count .plural').toggle(@todos.remaining() > 1)
 
   updateCompleted: ->
     @el.find('#clear-completed').toggle(@todos.completed() > 0)
-    T(@completedView()).render inside: @el.find('#clear-completed span')
-
-  completedView: ->
-    [ 'span'
-      'Clear completed '
-      @todos.completed()
-    ]
+    @el.find('.completed-value').text(@todos.completed())
 
   process: ->
     self = @
@@ -81,7 +75,15 @@ class @TodosView
         ]
       ]
       [ 'footer#footer'
-        @remainingView()
+        [ 'span#todo-count'
+          [ 'strong', @todos.remaining() ]
+          " item"
+          [ 'span.plural'
+            if @todos.remaining() <= 1 then display: 'none'
+            's'
+          ]
+          " left"
+        ]
         [ 'ul#filters'
           [ 'li.all'
             [ 'a', href: '#/', 'All']
@@ -95,7 +97,11 @@ class @TodosView
         ]
         [ 'button#clear-completed'
           click: -> self.todos.clearCompleted()
-          @completedView()
+          [ 'span'
+            'Clear completed ('
+            [ 'span.completed-value', @todos.completed() ]
+            ')'
+          ]
         ]
       ]
     ]
