@@ -2,14 +2,14 @@
 (function() {
   var router, todosView;
 
-  this.todos = TodosResource.load('todos');
+  this.todos = FreeMart.request('todos:load', 'todos');
 
-  $.subscribe(TODOS_CHANGED, function() {
-    return TodosResource.save('todos', todos);
+  FreeMart.request('subscribe', TODOS_CHANGED, function() {
+    return FreeMart.request('todos:save', 'todos', todos);
   });
 
   watch(this, 'todos', (function() {
-    return $.publish(TODOS_CHANGED);
+    return FreeMart.request('publish', TODOS_CHANGED);
   }), 1);
 
   todosView = new TodosView(todos);

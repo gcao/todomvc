@@ -5,7 +5,7 @@
   this.TodosView = (function() {
     function TodosView(todos) {
       this.todos = todos;
-      $.subscribe(TODOS_CHANGED, (function(_this) {
+      FreeMart.request('subscribe', TODOS_CHANGED, (function(_this) {
         return function() {
           return _this.updateUI();
         };
@@ -29,12 +29,6 @@
     };
 
     TodosView.prototype.updateChildren = function() {
-      var child, _i, _len, _ref;
-      _ref = this.children;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        child = _ref[_i];
-        child.destroy();
-      }
       return T(this.childrenView()).render({
         inside: this.el.find('#todo-list')
       });

@@ -1,12 +1,5 @@
 class @TodoView
   constructor: (@todos, @todo) ->
-    $.subscribe TODOS_CHANGED, @todosChangedHandler
-
-  destroy: ->
-    $.unsubscribe TODOS_CHANGED, @todosChangedHandler
-
-  todosChangedHandler: =>
-    console.log TODOS_CHANGED + ' ' + @todo.title
 
   close: ->
     return if not @el.hasClass('editing')
@@ -20,6 +13,11 @@ class @TodoView
     [ 'li'
       afterRender: (el) ->
         self.el = $(el)
+
+        callback = -> console.log TODOS_CHANGED + ' ' + self.todo.title
+        callback.removeIf = -> not $.contains(document, self.el[0])
+        FreeMart.request 'subscribe', TODOS_CHANGED, callback
+
         self.el.find('label').html(self.todo.title)
         self.el.toggleClass('completed', self.todo.completed)
         self.el.find('.toggle').attr('checked', self.todo.completed)

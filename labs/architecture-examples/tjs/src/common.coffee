@@ -26,8 +26,33 @@
 
 # A tiny pubsub
 # https://github.com/cowboy/jquery-tiny-pubsub/blob/master/src/tiny-pubsub.js
-o = $({})
-$.subscribe   = -> o.on     .apply o, arguments; return
-$.unsubscribe = -> o.off    .apply o, arguments; return
-$.publish     = -> o.trigger.apply o, arguments; return
+o         = $({})
+callbacks = {}
+
+FreeMart.register 'subscribe', (_, event, callback) ->
+  if callbacks.hasOwnProperty(event)
+    callbacks[event].push callback
+  else
+    callbacks[event] = [callback]
+
+  o.on event, callback
+
+FreeMart.register 'unsubscribe', (_, event, callback) ->
+  o.off event, callback
+
+FreeMart.register 'publish', (_, args...) ->
+  # check callbacks before triggering the event
+  event       = args[0]
+  myCallbacks = callbacks[event]
+
+  if myCallbacks and myCallbacks.length > 0
+    for callback, i in myCallbacks by -1
+      if callback.removeIf and callback.removeIf()
+        myCallbacks.splice(i, 1)
+        o.off event, callback
+
+    if myCallbacks.length > 0
+      o.trigger args...
+    else
+      delete callbacks[event]
 

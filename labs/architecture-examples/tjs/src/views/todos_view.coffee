@@ -1,6 +1,6 @@
 class @TodosView
   constructor: (@todos) ->
-    $.subscribe TODOS_CHANGED, => @updateUI()
+    FreeMart.request 'subscribe', TODOS_CHANGED, => @updateUI()
 
   filterBy: (filter) ->
     if ['all', 'active', 'completed'].indexOf(filter) < 0
@@ -18,8 +18,6 @@ class @TodosView
     @updateFooter()
 
   updateChildren: ->
-    child.destroy() for child in @children
-
     T(@childrenView()).render inside: @el.find('#todo-list')
 
   updateFooter: ->

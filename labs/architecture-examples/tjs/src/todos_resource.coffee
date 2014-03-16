@@ -21,3 +21,9 @@ class @TodosResource
   @save: (id, todos) ->
     localStorage.setItem(id, serialize(todos))
 
+FreeMart.register 'todos:load', (_, id) ->
+  TodosResource.load(id)
+
+FreeMart.register 'todos:save', (_, id, todos) ->
+  TodosResource.save(id, todos)
+
