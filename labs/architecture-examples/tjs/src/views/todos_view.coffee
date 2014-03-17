@@ -26,13 +26,11 @@ class @TodosView
     @updateCompleted()
 
   childrenView: ->
-    @children = []
     for todo in @todos
       if (@filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
         continue
 
       child = new TodoView(@todos, todo)
-      @children.push child
       child.process()
 
   updateRemaining: ->

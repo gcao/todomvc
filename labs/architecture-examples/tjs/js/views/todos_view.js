@@ -42,7 +42,6 @@
 
     TodosView.prototype.childrenView = function() {
       var child, todo, _i, _len, _ref, _results;
-      this.children = [];
       _ref = this.todos;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -51,7 +50,6 @@
           continue;
         }
         child = new TodoView(this.todos, todo);
-        this.children.push(child);
         _results.push(child.process());
       }
       return _results;
