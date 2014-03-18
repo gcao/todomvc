@@ -29,7 +29,7 @@
               return console.log(TODOS_CHANGED + ' ' + self.todo.title);
             };
             callback.removeIf = function() {
-              return !$.contains(document, self.el[0]);
+              return !$.contains(document, el);
             };
             FreeMart.request('subscribe', TODOS_CHANGED, callback);
             self.el.find('label').html(self.todo.title);

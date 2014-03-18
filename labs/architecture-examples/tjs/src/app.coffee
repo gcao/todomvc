@@ -15,7 +15,10 @@ todosView.render inside: '#todoapp'
 
 
 # Router
+FreeMart.register '/'       ,             -> todosView.filterBy('all')
+FreeMart.register '/:filter', (_, filter) -> todosView.filterBy(filter)
+
 router = new routes()
-router.get '/'       ,       -> todosView.filterBy('all')
-router.get '/:filter', (req) -> todosView.filterBy(req.params.filter)
+router.get '/'       ,       -> FreeMart.request '/'
+router.get '/:filter', (req) -> FreeMart.request '/:filter', req.params.filter
 

@@ -18,14 +18,22 @@
     inside: '#todoapp'
   });
 
-  router = new routes();
-
-  router.get('/', function() {
+  FreeMart.register('/', function() {
     return todosView.filterBy('all');
   });
 
+  FreeMart.register('/:filter', function(_, filter) {
+    return todosView.filterBy(filter);
+  });
+
+  router = new routes();
+
+  router.get('/', function() {
+    return FreeMart.request('/');
+  });
+
   router.get('/:filter', function(req) {
-    return todosView.filterBy(req.params.filter);
+    return FreeMart.request('/:filter', req.params.filter);
   });
 
 }).call(this);
