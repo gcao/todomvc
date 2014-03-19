@@ -15,8 +15,8 @@ class @TodoView
         self.el = $(el)
 
         callback = -> console.log TODOS_CHANGED + ' ' + self.todo.title
-        callback.removeIf = -> not $.contains(document, el)
-        FreeMart.request 'subscribe', TODOS_CHANGED, callback
+        callback.removeIf = -> not $.contains(document.body, el)
+        subscribe TODOS_CHANGED, callback
 
         self.el.find('label').html(self.todo.title)
         self.el.toggleClass('completed', self.todo.completed)

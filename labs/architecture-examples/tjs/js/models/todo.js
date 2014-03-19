@@ -5,7 +5,7 @@
       this.title = title;
       this.completed = completed != null ? completed : false;
       watch(this, ['title', 'completed'], function() {
-        return FreeMart.request('publish', TODOS_CHANGED);
+        return publish(TODOS_CHANGED);
       });
     }
 

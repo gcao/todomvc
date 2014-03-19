@@ -29,9 +29,9 @@
               return console.log(TODOS_CHANGED + ' ' + self.todo.title);
             };
             callback.removeIf = function() {
-              return !$.contains(document, el);
+              return !$.contains(document.body, el);
             };
-            FreeMart.request('subscribe', TODOS_CHANGED, callback);
+            subscribe(TODOS_CHANGED, callback);
             self.el.find('label').html(self.todo.title);
             self.el.toggleClass('completed', self.todo.completed);
             return self.el.find('.toggle').attr('checked', self.todo.completed);

@@ -5,7 +5,7 @@
   this.TodosView = (function() {
     function TodosView(todos) {
       this.todos = todos;
-      FreeMart.request('subscribe', TODOS_CHANGED, (function(_this) {
+      subscribe(TODOS_CHANGED, (function(_this) {
         return function() {
           return _this.updateUI();
         };

@@ -24,35 +24,35 @@
   watch obj, props, callback, 1
 
 
-# A tiny pubsub
-# https://github.com/cowboy/jquery-tiny-pubsub/blob/master/src/tiny-pubsub.js
-o         = $({})
 callbacks = {}
 
-FreeMart.register 'subscribe', (_, event, callback) ->
+@subscribe = (event, callback) ->
   if callbacks.hasOwnProperty(event)
     callbacks[event].push callback
   else
     callbacks[event] = [callback]
 
-  o.on event, callback
+@unsubscribe = (event, callback) ->
+  if callbacks[event]
+    index = callbacks[event].indexOf(callback)
+    if index >= 0
+      callbacks[event].splice index, 1
 
-FreeMart.register 'unsubscribe', (_, event, callback) ->
-  o.off event, callback
+    if callbacks[event].length is 0
+      delete callbacks[event]
 
-FreeMart.register 'publish', (_, args...) ->
+@publish = (event, args...) ->
   # check callbacks before triggering the event
-  event       = args[0]
   myCallbacks = callbacks[event]
 
   if myCallbacks and myCallbacks.length > 0
     for callback, i in myCallbacks by -1
       if callback.removeIf and callback.removeIf()
         myCallbacks.splice(i, 1)
-        o.off event, callback
 
     if myCallbacks.length > 0
-      o.trigger args...
+      for callback in myCallbacks
+        callback(event, args...)
     else
       delete callbacks[event]
 
