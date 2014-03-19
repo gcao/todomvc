@@ -4,12 +4,12 @@
 
   this.todos = FreeMart.request('todos:load', 'todos');
 
-  subscribe(TODOS_CHANGED, function() {
+  Busbup.subscribe(TODOS_CHANGED, function() {
     return FreeMart.request('todos:save', 'todos', todos);
   });
 
   watch(this, 'todos', (function() {
-    return publish(TODOS_CHANGED);
+    return Busbup.publish(TODOS_CHANGED);
   }), 1);
 
   todosView = new TodosView(todos);

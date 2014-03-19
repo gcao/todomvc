@@ -31,7 +31,7 @@
             callback.removeIf = function() {
               return !$.contains(document.body, el);
             };
-            subscribe(TODOS_CHANGED, callback);
+            Busbup.subscribe(TODOS_CHANGED, callback);
             self.el.find('label').html(self.todo.title);
             self.el.toggleClass('completed', self.todo.completed);
             return self.el.find('.toggle').attr('checked', self.todo.completed);

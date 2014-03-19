@@ -2,11 +2,11 @@
 @todos = FreeMart.request 'todos:load', 'todos'
 
 # Save on changed event
-subscribe TODOS_CHANGED, -> FreeMart.request('todos:save', 'todos', todos)
+Busbup.subscribe TODOS_CHANGED, -> FreeMart.request('todos:save', 'todos', todos)
 
 
 # Trigger changed event on array change
-watch @, 'todos', (-> publish TODOS_CHANGED), 1
+watch @, 'todos', (-> Busbup.publish TODOS_CHANGED), 1
 
 
 # Render TODOs

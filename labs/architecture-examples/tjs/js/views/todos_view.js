@@ -5,7 +5,7 @@
   this.TodosView = (function() {
     function TodosView(todos) {
       this.todos = todos;
-      subscribe(TODOS_CHANGED, (function(_this) {
+      Busbup.subscribe(TODOS_CHANGED, (function(_this) {
         return function() {
           return _this.updateUI();
         };

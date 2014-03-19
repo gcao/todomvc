@@ -5,7 +5,7 @@
       this.title = title;
       this.completed = completed != null ? completed : false;
       watch(this, ['title', 'completed'], function() {
-        return publish(TODOS_CHANGED);
+        return Busbup.publish(TODOS_CHANGED);
       });
     }
 
