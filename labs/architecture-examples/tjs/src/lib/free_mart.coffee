@@ -54,7 +54,7 @@ class Registry
 
   add: (key, provider) ->
     last = if @storage.length > 0 then @storage[@storage.length - 1]
-    if last instanceof HashRegistry and not last.accept key
+    if last instanceof HashRegistry and typeof key is 'string' and not last.accept key
       last[key] = provider
     else
       if typeof key is 'string'
@@ -362,5 +362,5 @@ FreeMartInternal.prototype.reqAll        = FreeMartInternal.prototype.requestAll
 FreeMartInternal.prototype.reqAllAsync   = FreeMartInternal.prototype.requestAllAsync
 
 @FreeMart       = new FreeMartInternal('Free Mart')
-@FreeMart.clone = (name) -> new FreeMartInternal(name)
+@FreeMart.create = (name) -> new FreeMartInternal(name)
 
