@@ -19,13 +19,11 @@ FreeMart.register '/'       ,             -> todosView.filterBy('all')
 FreeMart.register '/:filter', (_, filter) -> todosView.filterBy(filter)
 
 # Experimenting with before/after filters
-FreeMart.register /\/.*/, (options, rest...) ->
-  console.log "Before #{options.key}"
-  result = FreeMart.request options.key, rest...
-  console.log "After #{options.key}"
+FreeMart.register /\/.*/, (options) ->
+  console.log "Before #{options.$key}"
+  result = FreeMart.request arguments...
+  console.log " After #{options.$key}"
   result
-
-console.log FreeMart
 
 router = new routes()
 router.get '/'       ,       -> FreeMart.request '/'

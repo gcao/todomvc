@@ -60,10 +60,10 @@
       options = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       (_ref = this.market).log.apply(_ref, ["InUse.process", options].concat(__slice.call(args)));
       try {
-        this.in_use_keys.push(options.key);
+        this.in_use_keys.push(options.$key);
         return this.process_.apply(this, [options].concat(__slice.call(args)));
       } finally {
-        this.in_use_keys.splice(this.in_use_keys.indexOf(options.key), 1);
+        this.in_use_keys.splice(this.in_use_keys.indexOf(options.$key), 1);
       }
     },
     processing: function(key) {
@@ -138,16 +138,16 @@
       if (this.storage.length === 0) {
         return NO_PROVIDER;
       }
-      if (options.all) {
+      if (options.$all) {
         result = [];
         processed = false;
         _ref1 = this.storage;
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           item = _ref1[_i];
-          if (!item.accept(options.key)) {
+          if (!item.accept(options.$key)) {
             continue;
           }
-          if (item.processing(options.key)) {
+          if (item.processing(options.$key)) {
             continue;
           }
           processed = true;
@@ -165,10 +165,10 @@
         processed = false;
         for (i = _j = _ref2 = this.storage.length - 1; _ref2 <= 0 ? _j <= 0 : _j >= 0; i = _ref2 <= 0 ? ++_j : --_j) {
           item = this.storage[i];
-          if (!item.accept(options.key)) {
+          if (!item.accept(options.$key)) {
             continue;
           }
-          if (item.processing(options.key)) {
+          if (item.processing(options.$key)) {
             continue;
           }
           processed = true;
@@ -233,15 +233,15 @@
       var args, options, provider, _ref;
       options = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       (_ref = this.market).log.apply(_ref, ["HashRegistry.process_", options].concat(__slice.call(args)));
-      provider = this[options.key];
+      provider = this[options.$key];
       if (!provider) {
         return NO_PROVIDER;
       }
       try {
-        options.provider = provider;
+        options.$provider = provider;
         return provider.process.apply(provider, [options].concat(__slice.call(args)));
       } finally {
-        delete options.provider;
+        delete options.$provider;
       }
     };
 
@@ -285,14 +285,14 @@
       var args, options, _ref, _ref1;
       options = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       (_ref = this.market).log.apply(_ref, ["FuzzyRegistry.process_", options].concat(__slice.call(args)));
-      if (!this.accept(options.key)) {
+      if (!this.accept(options.$key)) {
         return NO_PROVIDER;
       }
       try {
-        options.provider = this.provider;
+        options.$provider = this.provider;
         return (_ref1 = this.provider).process.apply(_ref1, [options].concat(__slice.call(args)));
       } finally {
-        delete options.provider;
+        delete options.$provider;
       }
     };
 
@@ -312,9 +312,9 @@
       var args, options, result, _ref;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       (_ref = this.market).log.apply(_ref, ["Provider.process"].concat(__slice.call(args)));
-      result = this.options.value ? this.value : typeof this.value === 'function' ? this.value.apply(this, args) : this.value;
+      result = this.options.$value ? this.value : typeof this.value === 'function' ? this.value.apply(this, args) : this.value;
       options = args[0];
-      if (options != null ? options.async : void 0) {
+      if (options != null ? options.$async : void 0) {
         if (isDeferred(result)) {
           return result;
         } else {
@@ -334,7 +334,7 @@
   })();
 
   FreeMartInternal = (function() {
-    var createDeferredRequest;
+    var createDeferredRequest, handleFirstArg;
 
     function FreeMartInternal(name) {
       this.name = name;
@@ -347,14 +347,14 @@
     FreeMartInternal.prototype.createProvider = function(options, value) {
       var value_;
       value_ = value;
-      if (options.async) {
+      if (options.$async) {
         value_ = function() {
           var args, result;
           args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
           result = new Deferred();
           if (typeof value === 'function') {
             options = args[0];
-            options.deferred = result;
+            options.$deferred = result;
             value.apply(null, args);
           } else {
             result.resolve(value);
@@ -382,8 +382,8 @@
           request = _ref[_i];
           this.log.apply(this, ['register - deferred request', key].concat(__slice.call(request.args)));
           result = (_ref1 = this.registry).process.apply(_ref1, [{
-            key: key,
-            async: true
+            $key: key,
+            $async: true
           }].concat(__slice.call(request.args)));
           this.log('register - deferred request result', result);
           if (result === NOT_FOUND) {
@@ -413,14 +413,14 @@
     FreeMartInternal.prototype.value = function(key, value) {
       this.log('value', key, value);
       return this.register(key, {
-        value: true
+        $value: true
       }, value);
     };
 
     FreeMartInternal.prototype.registerAsync = function(key, value) {
       this.log('registerAsync', key, value);
       return this.register(key, {
-        async: true
+        $async: true
       }, value);
     };
 
@@ -429,13 +429,38 @@
       return this.registry.removeProvider(provider);
     };
 
+    handleFirstArg = function(arg, all, async) {
+      var key, options, value;
+      options = {};
+      if (typeof arg === 'string') {
+        options.$key = arg;
+      } else {
+        for (key in arg) {
+          if (!__hasProp.call(arg, key)) continue;
+          value = arg[key];
+          if (key.indexOf('$') !== 0 || ['$key', '$all', '$async'].indexOf(key) >= 0) {
+            options[key] = value;
+          }
+        }
+      }
+      if (all || async) {
+        delete options.$all;
+        delete options.$async;
+        if (all) {
+          options.$all = true;
+        }
+        if (async) {
+          options.$async = true;
+        }
+      }
+      return options;
+    };
+
     FreeMartInternal.prototype.request = function() {
       var args, key, result, _ref;
       key = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       this.log.apply(this, ['request', key].concat(__slice.call(args)));
-      result = (_ref = this.registry).process.apply(_ref, [{
-        key: key
-      }].concat(__slice.call(args)));
+      result = (_ref = this.registry).process.apply(_ref, [handleFirstArg(key)].concat(__slice.call(args)));
       if (result === NO_PROVIDER) {
         throw "NO PROVIDER: " + key;
       } else if (result === NOT_FOUND) {
@@ -458,10 +483,7 @@
       var args, key, request, result, _base, _ref;
       key = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       this.log.apply(this, ['requestAsync', key].concat(__slice.call(args)));
-      result = (_ref = this.registry).process.apply(_ref, [{
-        key: key,
-        async: true
-      }].concat(__slice.call(args)));
+      result = (_ref = this.registry).process.apply(_ref, [handleFirstArg(key, false, true)].concat(__slice.call(args)));
       if (result === NO_PROVIDER) {
         request = createDeferredRequest.apply(null, [key].concat(__slice.call(args)));
         (_base = this.queues)[key] || (_base[key] = []);
@@ -474,50 +496,11 @@
       }
     };
 
-    FreeMartInternal.prototype.requestMulti = function() {
-      var keyAndArg, keyAndArgs, _i, _len, _results;
-      keyAndArgs = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      this.log.apply(this, ['requestMulti'].concat(__slice.call(keyAndArgs)));
-      _results = [];
-      for (_i = 0, _len = keyAndArgs.length; _i < _len; _i++) {
-        keyAndArg = keyAndArgs[_i];
-        if (Object.prototype.toString.call(keyAndArg) === '[object Array]') {
-          _results.push(this.request.apply(this, keyAndArg));
-        } else {
-          _results.push(this.request(keyAndArg));
-        }
-      }
-      return _results;
-    };
-
-    FreeMartInternal.prototype.requestMultiAsync = function() {
-      var keyAndArg, keyAndArgs, requests;
-      keyAndArgs = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      this.log.apply(this, ['requestMultiAsync'].concat(__slice.call(keyAndArgs)));
-      requests = (function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = keyAndArgs.length; _i < _len; _i++) {
-          keyAndArg = keyAndArgs[_i];
-          if (typeof keyAndArg === 'object' && keyAndArg.length) {
-            _results.push(this.requestAsync.apply(this, keyAndArg));
-          } else {
-            _results.push(this.requestAsync(keyAndArg));
-          }
-        }
-        return _results;
-      }).call(this);
-      return Deferred.when.apply(Deferred, requests);
-    };
-
     FreeMartInternal.prototype.requestAll = function() {
       var args, key, _ref;
       key = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       this.log.apply(this, ['requestAll', key].concat(__slice.call(args)));
-      return (_ref = this.registry).process.apply(_ref, [{
-        key: key,
-        all: true
-      }].concat(__slice.call(args)));
+      return (_ref = this.registry).process.apply(_ref, [handleFirstArg(key, true, false)].concat(__slice.call(args)));
     };
 
     FreeMartInternal.prototype.requestAllAsync = function() {
@@ -525,11 +508,7 @@
       key = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       this.log.apply(this, ['requestAllAsync', key].concat(__slice.call(args)));
       result = new Deferred();
-      requests = (_ref = this.registry).process.apply(_ref, [{
-        key: key,
-        all: true,
-        async: true
-      }].concat(__slice.call(args)));
+      requests = (_ref = this.registry).process.apply(_ref, [handleFirstArg(key, true, true)].concat(__slice.call(args)));
       Deferred.when.apply(Deferred, requests).then(function() {
         var results;
         results = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
@@ -580,10 +559,6 @@
   FreeMartInternal.prototype.req = FreeMartInternal.prototype.request;
 
   FreeMartInternal.prototype.reqAsync = FreeMartInternal.prototype.requestAsync;
-
-  FreeMartInternal.prototype.reqMulti = FreeMartInternal.prototype.requestMulti;
-
-  FreeMartInternal.prototype.reqMultiAsync = FreeMartInternal.prototype.requestMultiAsync;
 
   FreeMartInternal.prototype.reqAll = FreeMartInternal.prototype.requestAll;
 
