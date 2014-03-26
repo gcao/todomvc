@@ -5,10 +5,6 @@
 todos.subscribe CHANGED, -> FreeMart.request('todos:save', 'todos', todos)
 
 
-# Trigger changed event on array change
-watch @, 'todos', (-> todos.publish CHANGED), 1
-
-
 # Render TODOs
 todosView = new TodosView(todos)
 todosView.render inside: '#todoapp'

@@ -8,10 +8,6 @@
     return FreeMart.request('todos:save', 'todos', todos);
   });
 
-  watch(this, 'todos', (function() {
-    return todos.publish(CHANGED);
-  }), 1);
-
   todosView = new TodosView(todos);
 
   todosView.render({
