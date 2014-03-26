@@ -22,7 +22,7 @@
       method = methods[_i];
       if (['constructor', 'length'].indexOf(method) < 0) {
         Collection.prototype[method] = function() {
-          return this._data[method].apply(this, arguments);
+          return Array.prototype[method].apply(this._data, arguments);
         };
       }
     }

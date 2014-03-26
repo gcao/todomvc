@@ -6,10 +6,11 @@
     function TodosResource() {}
 
     serialize = function(todos) {
-      var data, item, _i, _len;
+      var data, item, _i, _len, _ref;
       data = [];
-      for (_i = 0, _len = todos.length; _i < _len; _i++) {
-        item = todos[_i];
+      _ref = todos._data;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        item = _ref[_i];
         data.push({
           title: item.title,
           completed: item.completed
@@ -24,7 +25,7 @@
       if (str && (data = JSON.parse(str))) {
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           item = data[_i];
-          result.push(new Todo(result, item.title, item.completed));
+          result._data.push(new Todo(result, item.title, item.completed));
         }
       }
       return result;

@@ -1,7 +1,8 @@
 class @TodosResource
   serialize = (todos) ->
     data = []
-    for item in todos
+    #for item in todos
+    for item in todos._data
       data.push title: item.title, completed: item.completed
 
     JSON.stringify(data)
@@ -11,7 +12,8 @@ class @TodosResource
 
     if str and data = JSON.parse(str)
       for item in data
-        result.push new Todo(result, item.title, item.completed)
+        #result.push new Todo(result, item.title, item.completed)
+        result._data.push new Todo(result, item.title, item.completed)
 
     result
 

@@ -26,7 +26,8 @@ class @TodosView
     @updateCompleted()
 
   childrenView: ->
-    for todo in @todos
+    #for todo in @todos
+    for todo in @todos._data
       if (@filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
         continue
 
@@ -54,7 +55,8 @@ class @TodosView
         keyup: (e) ->
           el = $(@)
           if e.which is ENTER_KEY && el.val().trim()
-            self.todos.push(new Todo(self.todos, el.val().trim()))
+            #self.todos.push(new Todo(self.todos, el.val().trim()))
+            self.todos._data.push(new Todo(self.todos, el.val().trim()))
             el.val('')
       ]
       [ 'section#main'
