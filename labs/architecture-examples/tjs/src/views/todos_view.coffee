@@ -1,6 +1,6 @@
 class @TodosView
   constructor: (@todos) ->
-    @todos.subscribe CHANGED, => @updateUI()
+    @todos.subscribe CHANGED, => @updateView()
 
   filterBy: (filter) ->
     if ['all', 'active', 'completed'].indexOf(filter) < 0
@@ -11,9 +11,9 @@ class @TodosView
 
     @el.find('#filters a').removeClass('selected')
     @el.find("li.#{@filter} a").addClass('selected')
-    @updateUI()
+    @updateView()
 
-  updateUI: ->
+  updateView: ->
     @updateChildren()
     @updateFooter()
 

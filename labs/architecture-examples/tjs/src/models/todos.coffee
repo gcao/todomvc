@@ -1,4 +1,4 @@
-@Todos = Todos = (args...) ->
+@Todos = (args...) ->
   @push arg for arg in args
   Busbup.create(@)
   return

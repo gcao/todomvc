@@ -7,7 +7,7 @@
       this.todos = todos;
       this.todos.subscribe(CHANGED, (function(_this) {
         return function() {
-          return _this.updateUI();
+          return _this.updateView();
         };
       })(this));
     }
@@ -20,10 +20,10 @@
       this.filter = filter;
       this.el.find('#filters a').removeClass('selected');
       this.el.find("li." + this.filter + " a").addClass('selected');
-      return this.updateUI();
+      return this.updateView();
     };
 
-    TodosView.prototype.updateUI = function() {
+    TodosView.prototype.updateView = function() {
       this.updateChildren();
       return this.updateFooter();
     };
