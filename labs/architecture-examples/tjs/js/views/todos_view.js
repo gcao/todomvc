@@ -35,14 +35,14 @@
     };
 
     TodosView.prototype.updateFooter = function() {
-      this.el.find('#footer').toggle(this.todos.length > 0);
+      this.el.find('#footer').toggle(this.todos.length() > 0);
       this.updateRemaining();
       return this.updateCompleted();
     };
 
     TodosView.prototype.childrenView = function() {
       var child, todo, _i, _len, _ref, _results;
-      _ref = this.todos._data;
+      _ref = this.todos.children();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         todo = _ref[_i];
@@ -82,7 +82,7 @@
               var el;
               el = $(this);
               if (e.which === ENTER_KEY && el.val().trim()) {
-                self.todos._data.push(new Todo(self.todos, el.val().trim()));
+                self.todos.push(new Todo(self.todos, el.val().trim()));
                 return el.val('');
               }
             }

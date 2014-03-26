@@ -5,15 +5,11 @@ class @Todos extends @Collection
     watch @, '_data', => @publish CHANGED
 
   remaining: ->
-    #@filter (item) -> !item.completed
-    #.length()
-    @_data.filter (item) -> !item.completed
+    @filter (item) -> !item.completed
     .length
 
   completed: ->
-    #@filter (item) -> item.completed
-    #.length()
-    @_data.filter (item) -> item.completed
+    @filter (item) -> item.completed
     .length
 
   toggleAllCompleted: (completed) ->

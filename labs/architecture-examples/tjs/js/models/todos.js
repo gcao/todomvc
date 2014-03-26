@@ -17,13 +17,13 @@
     }
 
     Todos.prototype.remaining = function() {
-      return this._data.filter(function(item) {
+      return this.filter(function(item) {
         return !item.completed;
       }).length;
     };
 
     Todos.prototype.completed = function() {
-      return this._data.filter(function(item) {
+      return this.filter(function(item) {
         return item.completed;
       }).length;
     };

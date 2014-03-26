@@ -21,13 +21,12 @@ class @TodosView
     T(@childrenView()).render inside: @el.find('#todo-list')
 
   updateFooter: ->
-    @el.find('#footer').toggle(@todos.length > 0)
+    @el.find('#footer').toggle(@todos.length() > 0)
     @updateRemaining()
     @updateCompleted()
 
   childrenView: ->
-    #for todo in @todos
-    for todo in @todos._data
+    for todo in @todos.children()
       if (@filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
         continue
 
@@ -55,8 +54,7 @@ class @TodosView
         keyup: (e) ->
           el = $(@)
           if e.which is ENTER_KEY && el.val().trim()
-            #self.todos.push(new Todo(self.todos, el.val().trim()))
-            self.todos._data.push(new Todo(self.todos, el.val().trim()))
+            self.todos.push(new Todo(self.todos, el.val().trim()))
             el.val('')
       ]
       [ 'section#main'
