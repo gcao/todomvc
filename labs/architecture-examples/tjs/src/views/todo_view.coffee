@@ -1,6 +1,6 @@
 class @TodoView
   constructor: (@todos, @todo) ->
-    @todo.subscribe TODO_CHANGED, => @updateView()
+    @todo.subscribe CHANGED, => @updateView()
 
   updateView: ->
     @el.find('label').html(@todo.title)

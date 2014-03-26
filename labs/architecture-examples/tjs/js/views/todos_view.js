@@ -5,7 +5,7 @@
   this.TodosView = (function() {
     function TodosView(todos) {
       this.todos = todos;
-      Busbup.subscribe(TODOS_CHANGED, (function(_this) {
+      this.todos.subscribe(CHANGED, (function(_this) {
         return function() {
           return _this.updateUI();
         };
@@ -82,7 +82,7 @@
               var el;
               el = $(this);
               if (e.which === ENTER_KEY && el.val().trim()) {
-                self.todos.push(new Todo(el.val().trim()));
+                self.todos.push(new Todo(self.todos, el.val().trim()));
                 return el.val('');
               }
             }

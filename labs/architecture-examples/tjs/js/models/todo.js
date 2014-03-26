@@ -8,8 +8,8 @@
       Busbup.create(this);
       watch(this, ['title', 'completed'], (function(_this) {
         return function() {
-          _this.publish(TODO_CHANGED);
-          return _this.parent.publish(TODOS_CHANGED);
+          _this.publish(CHANGED);
+          return _this.parent.publish(CHANGED);
         };
       })(this));
     }

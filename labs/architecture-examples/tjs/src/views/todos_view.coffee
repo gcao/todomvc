@@ -1,6 +1,6 @@
 class @TodosView
   constructor: (@todos) ->
-    Busbup.subscribe TODOS_CHANGED, => @updateUI()
+    @todos.subscribe CHANGED, => @updateUI()
 
   filterBy: (filter) ->
     if ['all', 'active', 'completed'].indexOf(filter) < 0
@@ -54,7 +54,7 @@ class @TodosView
         keyup: (e) ->
           el = $(@)
           if e.which is ENTER_KEY && el.val().trim()
-            self.todos.push(new Todo(el.val().trim()))
+            self.todos.push(new Todo(self.todos, el.val().trim()))
             el.val('')
       ]
       [ 'section#main'

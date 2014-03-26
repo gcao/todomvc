@@ -4,7 +4,7 @@
     function TodoView(todos, todo) {
       this.todos = todos;
       this.todo = todo;
-      this.todo.subscribe(TODO_CHANGED, (function(_this) {
+      this.todo.subscribe(CHANGED, (function(_this) {
         return function() {
           return _this.updateView();
         };

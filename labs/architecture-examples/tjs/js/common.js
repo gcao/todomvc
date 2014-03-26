@@ -4,9 +4,7 @@
 
   this.ESC_KEY = 27;
 
-  this.TODO_CHANGED = 'todo_changed';
-
-  this.TODOS_CHANGED = 'todos_changed';
+  this.CHANGED = 'changed';
 
   this.bind = function(el, obj, props, options) {
     var callback, tagName;
