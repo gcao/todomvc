@@ -10,6 +10,7 @@
       arg = args[_i];
       this.push(arg);
     }
+    Busbup.create(this);
   };
 
   Todos.prototype = new Array;

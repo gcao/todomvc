@@ -1,5 +1,11 @@
 class @TodoView
   constructor: (@todos, @todo) ->
+    @todo.subscribe TODO_CHANGED, => @updateView()
+
+  updateView: ->
+    @el.find('label').html(@todo.title)
+    @el.toggleClass('completed', @todo.completed)
+    @el.find('.toggle').attr('checked', @todo.completed)
 
   close: ->
     return if not @el.hasClass('editing')
@@ -13,14 +19,7 @@ class @TodoView
     [ 'li'
       afterRender: (el) ->
         self.el = $(el)
-
-        callback = -> console.log TODOS_CHANGED + ' ' + self.todo.title
-        callback.removeIf = -> not $.contains(document.body, el)
-        Busbup.subscribe TODOS_CHANGED, callback
-
-        self.el.find('label').html(self.todo.title)
-        self.el.toggleClass('completed', self.todo.completed)
-        self.el.find('.toggle').attr('checked', self.todo.completed)
+        self.updateView()
       [ '.view'
         dblclick: ->
           self.el.addClass('editing')

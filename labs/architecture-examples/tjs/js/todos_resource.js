@@ -24,7 +24,7 @@
       if (str && (data = JSON.parse(str))) {
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           item = data[_i];
-          result.push(new Todo(item.title, item.completed));
+          result.push(new Todo(result, item.title, item.completed));
         }
       }
       return result;

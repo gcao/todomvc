@@ -11,7 +11,7 @@ class @TodosResource
 
     if str and data = JSON.parse(str)
       for item in data
-        result.push new Todo(item.title, item.completed)
+        result.push new Todo(result, item.title, item.completed)
 
     result
 

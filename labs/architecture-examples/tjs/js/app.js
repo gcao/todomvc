@@ -4,7 +4,7 @@
 
   this.todos = FreeMart.request('todos:load', 'todos');
 
-  Busbup.subscribe(TODOS_CHANGED, function() {
+  todos.subscribe(TODOS_CHANGED, function() {
     return FreeMart.request('todos:save', 'todos', todos);
   });
 

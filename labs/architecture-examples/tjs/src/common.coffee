@@ -2,6 +2,7 @@
 @ENTER_KEY = 13
 @ESC_KEY   = 27
 
+@TODO_CHANGED  = 'todo_changed'
 @TODOS_CHANGED = 'todos_changed'
 
 

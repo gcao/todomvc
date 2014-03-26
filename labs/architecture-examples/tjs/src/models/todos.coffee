@@ -1,5 +1,6 @@
 @Todos = Todos = (args...) ->
   @push arg for arg in args
+  Busbup.create(@)
   return
 
 Todos.prototype = new Array

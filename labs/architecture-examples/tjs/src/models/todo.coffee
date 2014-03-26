@@ -1,4 +1,7 @@
 class @Todo
-  constructor: (@title, @completed = false) ->
-    watch @, ['title', 'completed'], -> Busbup.publish TODOS_CHANGED
+  constructor: (@parent, @title, @completed = false) ->
+    Busbup.create(@)
+    watch @, ['title', 'completed'], =>
+      @publish TODO_CHANGED
+      @parent.publish TODOS_CHANGED
 

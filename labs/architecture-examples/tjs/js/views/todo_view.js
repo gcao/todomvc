@@ -4,7 +4,18 @@
     function TodoView(todos, todo) {
       this.todos = todos;
       this.todo = todo;
+      this.todo.subscribe(TODO_CHANGED, (function(_this) {
+        return function() {
+          return _this.updateView();
+        };
+      })(this));
     }
+
+    TodoView.prototype.updateView = function() {
+      this.el.find('label').html(this.todo.title);
+      this.el.toggleClass('completed', this.todo.completed);
+      return this.el.find('.toggle').attr('checked', this.todo.completed);
+    };
 
     TodoView.prototype.close = function() {
       var trimmedValue;
@@ -23,18 +34,8 @@
       return [
         'li', {
           afterRender: function(el) {
-            var callback;
             self.el = $(el);
-            callback = function() {
-              return console.log(TODOS_CHANGED + ' ' + self.todo.title);
-            };
-            callback.removeIf = function() {
-              return !$.contains(document.body, el);
-            };
-            Busbup.subscribe(TODOS_CHANGED, callback);
-            self.el.find('label').html(self.todo.title);
-            self.el.toggleClass('completed', self.todo.completed);
-            return self.el.find('.toggle').attr('checked', self.todo.completed);
+            return self.updateView();
           }
         }, [
           '.view', {

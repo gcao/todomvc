@@ -2,7 +2,7 @@
 @todos = FreeMart.request 'todos:load', 'todos'
 
 # Save on changed event
-Busbup.subscribe TODOS_CHANGED, -> FreeMart.request('todos:save', 'todos', todos)
+todos.subscribe TODOS_CHANGED, -> FreeMart.request('todos:save', 'todos', todos)
 
 
 # Trigger changed event on array change
