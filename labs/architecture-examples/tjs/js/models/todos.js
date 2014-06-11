@@ -9,6 +9,9 @@
     function Todos() {
       Todos.__super__.constructor.apply(this, arguments);
       Busbup.create(this);
+      this.subscribe(CHANGED, function() {
+        return console.log('Todos are changed');
+      });
       watch(this, '_data', (function(_this) {
         return function() {
           return _this.publish(CHANGED);

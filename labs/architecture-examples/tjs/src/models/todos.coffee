@@ -2,6 +2,7 @@ class @Todos extends @Collection
   constructor: ->
     super
     Busbup.create(@)
+    @subscribe CHANGED, -> console.log 'Todos are changed'
     watch @, '_data', => @publish CHANGED
 
   remaining: ->

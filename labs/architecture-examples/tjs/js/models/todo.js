@@ -6,6 +6,11 @@
       this.title = title;
       this.completed = completed != null ? completed : false;
       Busbup.create(this);
+      this.subscribe(CHANGED, (function(_this) {
+        return function() {
+          return console.log("Todo <" + _this.title + "> is changed");
+        };
+      })(this));
       watch(this, ['title', 'completed'], (function(_this) {
         return function() {
           _this.publish(CHANGED);
