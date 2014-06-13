@@ -1,11 +1,7 @@
 class @TodoView
   constructor: (@todos, @todo) ->
-    @todo.subscribe CHANGED, => @updateView()
-
-  updateView: ->
-    @el.find('label').html(@todo.title)
-    @el.toggleClass('completed', @todo.completed)
-    @el.find('.toggle').attr('checked', @todo.completed)
+    @todo.subscribe CHANGED, =>
+      T(@process()).render replace: @el
 
   close: ->
     return if not @el.hasClass('editing')
@@ -17,18 +13,18 @@ class @TodoView
   process: ->
     self = @
     [ 'li'
-      afterRender: (el) ->
-        self.el = $(el)
-        self.updateView()
+      class: ('completed' if @todo.completed)
+      afterRender: (el) -> self.el = $(el)
       [ '.view'
         dblclick: ->
           self.el.addClass('editing')
           self.input.focus()
-        [ 'input.toggle'
+        [ "input.toggle"
           type: 'checkbox'
+          checked: ('checked' if @todo.completed)
           click: -> self.todo.completed = !self.todo.completed
         ]
-        [ 'label', @title ]
+        [ 'label', @todo.title ]
         [ 'button.destroy'
           click: -> self.todos.splice self.todos.indexOf(self.todo), 1
         ]

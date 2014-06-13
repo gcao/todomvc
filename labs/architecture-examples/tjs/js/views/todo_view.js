@@ -6,16 +6,12 @@
       this.todo = todo;
       this.todo.subscribe(CHANGED, (function(_this) {
         return function() {
-          return _this.updateView();
+          return T(_this.process()).render({
+            replace: _this.el
+          });
         };
       })(this));
     }
-
-    TodoView.prototype.updateView = function() {
-      this.el.find('label').html(this.todo.title);
-      this.el.toggleClass('completed', this.todo.completed);
-      return this.el.find('.toggle').attr('checked', this.todo.completed);
-    };
 
     TodoView.prototype.close = function() {
       var trimmedValue;
@@ -33,9 +29,9 @@
       self = this;
       return [
         'li', {
+          "class": (this.todo.completed ? 'completed' : void 0),
           afterRender: function(el) {
-            self.el = $(el);
-            return self.updateView();
+            return self.el = $(el);
           }
         }, [
           '.view', {
@@ -44,13 +40,14 @@
               return self.input.focus();
             }
           }, [
-            'input.toggle', {
+            "input.toggle", {
               type: 'checkbox',
+              checked: (this.todo.completed ? 'checked' : void 0),
               click: function() {
                 return self.todo.completed = !self.todo.completed;
               }
             }
-          ], ['label', this.title], [
+          ], ['label', this.todo.title], [
             'button.destroy', {
               click: function() {
                 return self.todos.splice(self.todos.indexOf(self.todo), 1);
