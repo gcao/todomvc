@@ -6,17 +6,12 @@
   this.TodosView = (function() {
     function TodosView(todos) {
       this.todos = todos;
+      console.log('TodosView.constructor');
     }
 
     TodosView.prototype.process = function() {
-      var self;
-      self = this;
       return [
-        'header#header', {
-          afterRender: function(el) {
-            return self.el = $(el);
-          }
-        }, ['h1', 'todos'], [
+        'header#header', ['h1', 'todos'], [
           'input#new-todo', {
             type: 'text',
             placeholder: 'What needs to be done?',
@@ -77,7 +72,7 @@
     }
 
     TodosChildrenView.prototype.process = function() {
-      var child, self, todo;
+      var self, todo;
       self = this;
       return [
         'ul#todo-list', {
@@ -93,8 +88,7 @@
             if ((window.filter === 'active' && todo.completed) || (window.filter === 'completed' && !todo.completed)) {
               continue;
             }
-            child = new TodoView(this.todos, todo);
-            _results.push(child.process());
+            _results.push(new TodoView(this.todos, todo).process());
           }
           return _results;
         }).call(this)
@@ -169,7 +163,11 @@
             ]
           ]
         ], [
-          'button#clear-completed', {
+          'button#clear-completed', this.todos.completed() === 0 ? {
+            style: {
+              display: 'none'
+            }
+          } : void 0, {
             click: function() {
               return self.todos.clearCompleted();
             }

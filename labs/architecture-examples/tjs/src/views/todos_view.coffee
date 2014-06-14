@@ -1,10 +1,9 @@
 class @TodosView
   constructor: (@todos) ->
+    console.log 'TodosView.constructor'
 
   process: ->
-    self = @
     [ 'header#header'
-      afterRender: (el) -> self.el = $(el)
 
       [ 'h1', 'todos' ]
       [ 'input#new-todo'
@@ -51,8 +50,7 @@ class TodosChildrenView
         if (window.filter is 'active' and todo.completed) or (window.filter is 'completed' and not todo.completed)
           continue
 
-        child = new TodoView(@todos, todo)
-        child.process()
+        new TodoView(@todos, todo).process()
     ]
 
 class @TodosFooterView
@@ -97,6 +95,8 @@ class @TodosFooterView
         ]
       ]
       [ 'button#clear-completed'
+        if @todos.completed() is 0
+          style: display: 'none'
         click: -> self.todos.clearCompleted()
         [ 'span'
           'Clear completed ('
