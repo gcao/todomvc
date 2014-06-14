@@ -15,11 +15,11 @@
   });
 
   FreeMart.register('/', function() {
-    return todosView.filterBy('all');
+    return window.filterBy('all');
   });
 
   FreeMart.register('/:filter', function(_, filter) {
-    return todosView.filterBy(filter);
+    return window.filterBy(filter);
   });
 
   FreeMart.register(/\/.*/, function(options) {

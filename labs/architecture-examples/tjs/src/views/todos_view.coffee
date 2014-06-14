@@ -1,45 +1,5 @@
 class @TodosView
   constructor: (@todos) ->
-    @todos.subscribe CHANGED, => @updateView()
-
-  filterBy: (filter) ->
-    if ['all', 'active', 'completed'].indexOf(filter) < 0
-      console.log "Filter is not supported: '#{filter}'"
-      return
-
-    @filter = filter
-
-    @el.find('#filters a').removeClass('selected')
-    @el.find("li.#{@filter} a").addClass('selected')
-    @updateView()
-
-  updateView: ->
-    @updateChildren()
-    @updateFooter()
-
-  updateChildren: ->
-    T(@childrenView()).render inside: @el.find('#todo-list')
-
-  updateFooter: ->
-    @el.find('#footer').toggle(@todos.length() > 0)
-    @updateRemaining()
-    @updateCompleted()
-
-  childrenView: ->
-    for todo in @todos.children()
-      if (@filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
-        continue
-
-      child = new TodoView(@todos, todo)
-      child.process()
-
-  updateRemaining: ->
-    @el.find('#todo-count strong').text(@todos.remaining())
-    @el.find('#todo-count .plural').toggle(@todos.remaining() > 1)
-
-  updateCompleted: ->
-    @el.find('#clear-completed').toggle(@todos.completed() > 0)
-    @el.find('.completed-value').text(@todos.completed())
 
   process: ->
     self = @
@@ -66,42 +26,83 @@ class @TodosView
           for: 'toggle-all'
           'Mark all as complete'
         ]
-        [ 'ul#todo-list'
-          @childrenView()
-        ]
+        new TodosChildrenView(@todos).process()
       ]
-      [ 'footer#footer'
-        [ 'span#todo-count'
-          [ 'strong', @todos.remaining() ]
-          " item"
-          [ 'span.plural'
-            if @todos.remaining() <= 1 then display: 'none'
-            's'
-          ]
-          " left"
-        ]
-        [ 'ul#filters'
-          [ 'li.all'
-            [ 'a', href: '#/', 'All']
-          ]
-          [ 'li.active'
-            [ 'a', href: '#/active', 'Active']
-          ]
-          [ 'li.completed'
-            [ 'a', href: '#/completed', 'Completed']
-          ]
-        ]
-        [ 'button#clear-completed'
-          click: -> self.todos.clearCompleted()
-          [ 'span'
-            'Clear completed ('
-            [ 'span.completed-value', @todos.completed() ]
-            ')'
-          ]
-        ]
-      ]
+
+      new TodosFooterView(@todos).process()
     ]
 
   render: (args...) ->
     T(@process()).render args...
+
+class TodosChildrenView
+  constructor: (@todos) ->
+    @todos.subscribe CHANGED, =>
+      T(@process()).render replace: @el
+
+    Busbup.subscribe FILTER, =>
+      T(@process()).render replace: @el
+
+  process: ->
+    self = @
+    [ 'ul#todo-list'
+      afterRender: (el) -> self.el = $(el)
+      for todo in @todos.children()
+        if (window.filter is 'active' and todo.completed) or (window.filter is 'completed' and not todo.completed)
+          continue
+
+        child = new TodoView(@todos, todo)
+        child.process()
+    ]
+
+class @TodosFooterView
+  constructor: (@todos) ->
+    @todos.subscribe CHANGED, =>
+      T(@process()).render replace: @el
+
+    Busbup.subscribe FILTER, =>
+      @setFilter(window.filter)
+
+  setFilter: (filter) ->
+    @el.find('#filters li a').removeClass('selected')
+    @el.find("li.#{filter} a").addClass('selected')
+
+  process: ->
+    self = @
+    [ 'footer#footer'
+      afterRender: (el) ->
+        self.el = $(el)
+        self.setFilter(window.filter)
+      if @todos.length() is 0
+        style: display: 'none'
+      [ 'span#todo-count'
+        [ 'strong', @todos.remaining() ]
+        " item"
+        [ 'span.plural'
+          if @todos.remaining() <= 1
+            style: display: 'none'
+          's'
+        ]
+        " left"
+      ]
+      [ 'ul#filters'
+        [ 'li.all'
+          [ 'a', href: '#/', 'All']
+        ]
+        [ 'li.active'
+          [ 'a', href: '#/active', 'Active']
+        ]
+        [ 'li.completed'
+          [ 'a', href: '#/completed', 'Completed']
+        ]
+      ]
+      [ 'button#clear-completed'
+        click: -> self.todos.clearCompleted()
+        [ 'span'
+          'Clear completed ('
+          [ 'span.completed-value', @todos.completed() ]
+          ')'
+        ]
+      ]
+    ]
 

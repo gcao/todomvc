@@ -11,8 +11,8 @@ todosView.render inside: '#todoapp'
 
 
 # Router
-FreeMart.register '/'       ,             -> todosView.filterBy('all')
-FreeMart.register '/:filter', (_, filter) -> todosView.filterBy(filter)
+FreeMart.register '/'       ,             -> window.filterBy('all')
+FreeMart.register '/:filter', (_, filter) -> window.filterBy(filter)
 
 # Experimenting with before/after filters
 FreeMart.register /\/.*/, (options) ->
