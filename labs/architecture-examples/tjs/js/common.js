@@ -16,15 +16,4 @@
     return func.apply(func, arguments);
   };
 
-  this.filter = 'all';
-
-  this.filterBy = function(filter) {
-    if (['all', 'active', 'completed'].indexOf(filter) < 0) {
-      return console.log("Filter is not supported: '" + filter + "'");
-    } else {
-      this.filter = filter;
-      return Busbup.publish(FILTER, filter);
-    }
-  };
-
 }).call(this);
