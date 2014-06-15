@@ -1,30 +1,34 @@
-@filter   = 'all'
-filterBy = (_filter) ->
-  if ['all', 'active', 'completed'].indexOf(_filter) < 0
-    console.log "Filter is not supported: '#{_filter}'"
+todos = undefined
+getTodos = ->
+  if todos
+    todos
   else
-    @filter = _filter
-    Busbup.publish FILTER, @filter
-
-loadTodos = ->
-  todos = FreeMart.request 'todos:load', 'todos'
-  # Save on change
-  todos.subscribe CHANGED, -> FreeMart.request('todos:save', 'todos', todos)
-  todos
+    todos = FreeMart.request 'todos:load', 'todos'
+    # Save on change
+    todos.subscribe CHANGED, -> FreeMart.request('todos:save', 'todos', todos)
+    todos
 
 todosView = undefined
-showTodos = ->
-  unless todosView
-    todosView = new TodosView(loadTodos())
+showTodos = (todos, filter) ->
+  if todosView
+    Busbup.publish FILTER, filter
+  else
+    todosView = new TodosView(todos, filter)
     todosView.render inside: '#todoapp'
 
+isValidFilter = (filter) ->
+  ['all', 'active', 'completed'].indexOf(filter) >= 0
+
+
+# Routes and handlers
 FreeMart.register '/', -> 
-  filterBy('all')
-  showTodos()
+  showTodos(getTodos(), 'all')
 
 FreeMart.register '/:filter', (_, filter) -> 
-  filterBy(filter)
-  showTodos()
+  if isValidFilter filter
+    showTodos(getTodos(), filter)
+  else
+    console.log "Filter is not supported: '#{filter}'"
 
 # Experimenting with before/after filters
 FreeMart.register /\/.*/, (options) ->

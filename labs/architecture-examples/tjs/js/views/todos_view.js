@@ -4,12 +4,15 @@
     __slice = [].slice;
 
   this.TodosView = (function() {
-    function TodosView(todos) {
+    function TodosView(todos, filter) {
       this.todos = todos;
+      this.filter = filter;
       console.log('TodosView.constructor');
     }
 
     TodosView.prototype.process = function() {
+      var self;
+      self = this;
       return [
         'header#header', ['h1', 'todos'], [
           'input#new-todo', {
@@ -37,8 +40,8 @@
             'label', {
               "for": 'toggle-all'
             }, 'Mark all as complete'
-          ], new TodosChildrenView(this.todos).process()
-        ], new TodosFooterView(this.todos).process()
+          ], new TodosChildrenView(this.todos, this.filter).process()
+        ], new TodosFooterView(this.todos, this.filter).process()
       ];
     };
 
@@ -53,8 +56,9 @@
   })();
 
   TodosChildrenView = (function() {
-    function TodosChildrenView(todos) {
+    function TodosChildrenView(todos, filter) {
       this.todos = todos;
+      this.filter = filter;
       this.todos.subscribe(CHANGED, (function(_this) {
         return function() {
           return T(_this.process()).render({
@@ -63,7 +67,8 @@
         };
       })(this));
       Busbup.subscribe(FILTER, (function(_this) {
-        return function() {
+        return function(_, filter) {
+          _this.filter = filter;
           return T(_this.process()).render({
             replace: _this.el
           });
@@ -85,7 +90,7 @@
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             todo = _ref[_i];
-            if ((window.filter === 'active' && todo.completed) || (window.filter === 'completed' && !todo.completed)) {
+            if ((this.filter === 'active' && todo.completed) || (this.filter === 'completed' && !todo.completed)) {
               continue;
             }
             _results.push(new TodoView(this.todos, todo).process());
@@ -100,8 +105,9 @@
   })();
 
   this.TodosFooterView = (function() {
-    function TodosFooterView(todos) {
+    function TodosFooterView(todos, filter) {
       this.todos = todos;
+      this.filter = filter;
       this.todos.subscribe(CHANGED, (function(_this) {
         return function() {
           return T(_this.process()).render({
@@ -110,15 +116,16 @@
         };
       })(this));
       Busbup.subscribe(FILTER, (function(_this) {
-        return function() {
-          return _this.setFilter(window.filter);
+        return function(_, filter) {
+          _this.filter = filter;
+          return _this.updateLinks();
         };
       })(this));
     }
 
-    TodosFooterView.prototype.setFilter = function(filter) {
+    TodosFooterView.prototype.updateLinks = function() {
       this.el.find('#filters li a').removeClass('selected');
-      return this.el.find("li." + filter + " a").addClass('selected');
+      return this.el.find("li." + this.filter + " a").addClass('selected');
     };
 
     TodosFooterView.prototype.process = function() {
@@ -128,7 +135,7 @@
         'footer#footer', {
           afterRender: function(el) {
             self.el = $(el);
-            return self.setFilter(window.filter);
+            return self.updateLinks();
           }
         }, this.todos.length() === 0 ? {
           style: {

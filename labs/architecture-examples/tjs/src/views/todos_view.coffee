@@ -1,10 +1,10 @@
 class @TodosView
-  constructor: (@todos) ->
+  constructor: (@todos, @filter) ->
     console.log 'TodosView.constructor'
 
   process: ->
+    self = @
     [ 'header#header'
-
       [ 'h1', 'todos' ]
       [ 'input#new-todo'
         type: 'text'
@@ -25,21 +25,22 @@ class @TodosView
           for: 'toggle-all'
           'Mark all as complete'
         ]
-        new TodosChildrenView(@todos).process()
+        new TodosChildrenView(@todos, @filter).process()
       ]
 
-      new TodosFooterView(@todos).process()
+      new TodosFooterView(@todos, @filter).process()
     ]
 
   render: (args...) ->
     T(@process()).render args...
 
 class TodosChildrenView
-  constructor: (@todos) ->
+  constructor: (@todos, @filter) ->
     @todos.subscribe CHANGED, =>
       T(@process()).render replace: @el
 
-    Busbup.subscribe FILTER, =>
+    Busbup.subscribe FILTER, (_, filter) =>
+      @filter = filter
       T(@process()).render replace: @el
 
   process: ->
@@ -47,30 +48,31 @@ class TodosChildrenView
     [ 'ul#todo-list'
       afterRender: (el) -> self.el = $(el)
       for todo in @todos.children()
-        if (window.filter is 'active' and todo.completed) or (window.filter is 'completed' and not todo.completed)
+        if (@filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
           continue
 
         new TodoView(@todos, todo).process()
     ]
 
 class @TodosFooterView
-  constructor: (@todos) ->
+  constructor: (@todos, @filter) ->
     @todos.subscribe CHANGED, =>
       T(@process()).render replace: @el
 
-    Busbup.subscribe FILTER, =>
-      @setFilter(window.filter)
+    Busbup.subscribe FILTER, (_, filter) =>
+      @filter = filter
+      @updateLinks()
 
-  setFilter: (filter) ->
+  updateLinks: ->
     @el.find('#filters li a').removeClass('selected')
-    @el.find("li.#{filter} a").addClass('selected')
+    @el.find("li.#{@filter} a").addClass('selected')
 
   process: ->
     self = @
     [ 'footer#footer'
       afterRender: (el) ->
         self.el = $(el)
-        self.setFilter(window.filter)
+        self.updateLinks()
       if @todos.length() is 0
         style: display: 'none'
       [ 'span#todo-count'
