@@ -54,25 +54,33 @@ class TodosChildrenView
         new TodoView(@todos, todo).process()
     ]
 
-class @TodosFooterView
+class TodosFooterView
   constructor: (@todos, @filter) ->
     @todos.subscribe CHANGED, =>
       T(@process()).render replace: @el
 
     Busbup.subscribe FILTER, (_, filter) =>
       @filter = filter
-      @updateLinks()
 
-  updateLinks: ->
-    @el.find('#filters li a').removeClass('selected')
-    @el.find("li.#{@filter} a").addClass('selected')
+  filters: ->
+    [
+      name: 'all'
+      label: 'All'
+      selected: @filter is 'all'
+    ,
+      name: 'active'
+      label: 'Active'
+      selected: @filter is 'active'
+    ,
+      name: 'completed'
+      label: 'Completed'
+      selected: @filter is 'completed'
+    ]
 
   process: ->
     self = @
     [ 'footer#footer'
-      afterRender: (el) ->
-        self.el = $(el)
-        self.updateLinks()
+      afterRender: (el) -> self.el = $(el)
       if @todos.length() is 0
         style: display: 'none'
       [ 'span#todo-count'
@@ -86,15 +94,7 @@ class @TodosFooterView
         " left"
       ]
       [ 'ul#filters'
-        [ 'li.all'
-          [ 'a', href: '#/', 'All']
-        ]
-        [ 'li.active'
-          [ 'a', href: '#/active', 'Active']
-        ]
-        [ 'li.completed'
-          [ 'a', href: '#/completed', 'Completed']
-        ]
+        new FooterFilterLink(filter).process() for filter in @filters()
       ]
       [ 'button#clear-completed'
         if @todos.completed() is 0
@@ -105,6 +105,24 @@ class @TodosFooterView
           [ 'span.completed-value', @todos.completed() ]
           ')'
         ]
+      ]
+    ]
+
+class FooterFilterLink
+  constructor: (@filter) ->
+    Busbup.subscribe FILTER, (_, filter) =>
+      @filter.selected = filter is @filter.name
+      T(@process()).render replace: @el
+
+  process: ->
+    self = @
+    [ 'li'
+      afterRender: (el) -> self.el = $(el)
+      class: @filter.name
+      [ 'a'
+        class: 'selected' if @filter.selected
+        href: "#/#{@filter.name}"
+        @filter.label
       ]
     ]
 
