@@ -56,9 +56,6 @@ class TodosChildrenView
 
 class TodosFooterView
   constructor: (@todos, @filter) ->
-    @todos.subscribe CHANGED, =>
-      T(@process()).render replace: @el
-
     Busbup.subscribe FILTER, (_, filter) =>
       @filter = filter
 
@@ -80,7 +77,6 @@ class TodosFooterView
   process: ->
     self = @
     [ 'footer#footer'
-      afterRender: (el) -> self.el = $(el)
       if @todos.length() is 0
         style: display: 'none'
       [ 'span#todo-count'
