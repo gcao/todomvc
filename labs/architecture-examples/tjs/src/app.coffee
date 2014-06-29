@@ -13,7 +13,8 @@ showTodos = (todos, filter) ->
   if todosView
     Busbup.publish FILTER, filter
   else
-    todosView = new TodosView(todos, filter)
+    #todosView = new TodosView(todos, filter)
+    todosView = new TodosView2 todos: todos, filter: filter
     todosView.render inside: '#todoapp'
 
 isValidFilter = (filter) ->

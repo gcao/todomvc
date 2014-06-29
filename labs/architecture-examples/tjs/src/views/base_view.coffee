@@ -4,9 +4,28 @@ class BaseView
     @initialize()
 
   initialize: ->
-  
-class @TodosView2 extends BaseView
+
   process: ->
+    self = @
+    result = @template()
+
+    # Add afterRender callback to set @el
+    callback = (el) -> self.el = el
+    if result[1]and typeof result[1] is "object" and (result[1] not instanceof Array)
+      if result[1].afterRender
+        result[1].afterRender.unshift callback
+      else
+        result[1].afterRender = callback
+    else
+      result.splice(1, 0, afterRender: callback)
+
+    result
+
+  render: (args...) ->
+    T(@process()).render args...
+
+class @TodosView2 extends BaseView
+  template: ->
     self = @
     [ 'header#header'
       [ 'h1', 'todos' ]
@@ -36,9 +55,6 @@ class @TodosView2 extends BaseView
       new TodosFooterView(todos: @data.todos, filter: @data.filter).process()
     ]
 
-  render: (args...) ->
-    T(@process()).render args...
-
 class TodoView extends BaseView
   initialize: ->
     @data.todo.subscribe CHANGED, =>
@@ -51,21 +67,20 @@ class TodoView extends BaseView
     if trimmedValue = @input.val().trim()
       @data.todo.title = trimmedValue
 
-  process: ->
+  template: ->
     self = @
     [ 'li'
-      class: ('completed' if @todo.completed)
-      afterRender: (el) -> self.el = $(el)
+      class: 'completed' if @data.todo.completed
       [ '.view'
         dblclick: ->
           self.el.addClass('editing')
           self.input.focus()
         [ "input.toggle"
           type: 'checkbox'
-          checked: ('checked' if @todo.completed)
+          checked: ('checked' if @data.todo.completed)
           click: -> self.data.todo.completed = !self.data.todo.completed
         ]
-        [ 'label', @todo.title ]
+        [ 'label', @data.todo.title ]
         [ 'button.destroy'
           click: -> self.data.todos.splice self.data.todos.indexOf(self.data.todo), 1
         ]
@@ -86,19 +101,17 @@ class TodoView extends BaseView
 
 class TodosChildrenView extends BaseView
   initialize: ->
-    @todos.subscribe CHANGED, =>
+    @data.todos.subscribe CHANGED, =>
       T(@process()).render replace: @el
 
     Busbup.subscribe FILTER, (_, filter) =>
       @data.filter = filter
       T(@process()).render replace: @el
 
-  process: ->
-    self = @
+  template: ->
     [ 'ul#todo-list'
-      afterRender: (el) -> self.el = $(el)
       for todo in @data.todos.children()
-        if (@data.filter is 'active' and todo.completed) or (@filter is 'completed' and not todo.completed)
+        if (@data.filter is 'active' and todo.completed) or (@data.filter is 'completed' and not todo.completed)
           continue
 
         new TodoView(todos: @data.todos, todo: todo).process()
@@ -106,6 +119,9 @@ class TodosChildrenView extends BaseView
 
 class TodosFooterView extends BaseView
   initialize: ->
+    @data.todos.subscribe CHANGED, =>
+      T(@process()).render replace: @el
+
     Busbup.subscribe FILTER, (_, filter) =>
       @data.filter = filter
 
@@ -124,7 +140,7 @@ class TodosFooterView extends BaseView
       selected: @data.filter is 'completed'
     ]
 
-  process: ->
+  template: ->
     self = @
     [ 'footer#footer'
       if @data.todos.length() is 0
@@ -143,7 +159,7 @@ class TodosFooterView extends BaseView
         new FooterFilterLink(filter).process() for filter in @filters()
       ]
       [ 'button#clear-completed'
-        if @todos.completed() is 0
+        if @data.todos.completed() is 0
           style: display: 'none'
         click: -> self.data.todos.clearCompleted()
         [ 'span'
@@ -160,11 +176,8 @@ class FooterFilterLink extends BaseView
       @data.selected = filter is @data.name
       T(@process()).render replace: @el
 
-  process: ->
-    self = @
-    [ 'li'
-      afterRender: (el) -> self.el = $(el)
-      class: @data.name
+  template: ->
+    [ "li.#{@data.name}"
       [ 'a'
         class: 'selected' if @data.selected
         href: "#/#{@data.name}"

@@ -180,7 +180,7 @@
 
   internal.FIRST_NO_PROCESS_PATTERN = /^<.*/;
 
-  internal.FIRST_FIELD_PATTERN = /^([^#.]+)?(#([^.]+))?(.(.*))?$/;
+  internal.FIRST_FIELD_PATTERN = /^([^#.]+)?(#([^.]+))?(\..*)?$/;
 
   internal.processFirst = function(items) {
     var attrs, classes, first, i, id, matches, part, parts, rest, tag;
@@ -209,17 +209,24 @@
     if (matches = first.match(internal.FIRST_FIELD_PATTERN)) {
       tag = matches[1] || 'div';
       id = matches[3];
-      classes = matches[5];
+      classes = matches[4];
+      if (classes) {
+        classes = classes.replace(/\.+/g, ' ').trim();
+      }
       if (id || classes) {
         attrs = {};
         if (id) {
           attrs.id = id;
         }
         if (classes) {
-          attrs["class"] = classes.replace(/\./g, ' ');
+          attrs["class"] = classes;
         }
         items.splice(0, 1, tag, attrs);
+      } else {
+        items[0] = tag;
       }
+    } else {
+      throw "Invalid first field: " + first + ", must match tag#id.class1.class2";
     }
     return items;
   };

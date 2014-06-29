@@ -17,6 +17,33 @@
 
     BaseView.prototype.initialize = function() {};
 
+    BaseView.prototype.process = function() {
+      var callback, result, self;
+      self = this;
+      result = this.template();
+      callback = function(el) {
+        return self.el = el;
+      };
+      if (result[1] && typeof result[1] === "object" && (!(result[1] instanceof Array))) {
+        if (result[1].afterRender) {
+          result[1].afterRender.unshift(callback);
+        } else {
+          result[1].afterRender = callback;
+        }
+      } else {
+        result.splice(1, 0, {
+          afterRender: callback
+        });
+      }
+      return result;
+    };
+
+    BaseView.prototype.render = function() {
+      var args, _ref;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return (_ref = T(this.process())).render.apply(_ref, args);
+    };
+
     return BaseView;
 
   })();
@@ -28,7 +55,7 @@
       return TodosView2.__super__.constructor.apply(this, arguments);
     }
 
-    TodosView2.prototype.process = function() {
+    TodosView2.prototype.template = function() {
       var self;
       self = this;
       return [
@@ -69,12 +96,6 @@
       ];
     };
 
-    TodosView2.prototype.render = function() {
-      var args, _ref;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return (_ref = T(this.process())).render.apply(_ref, args);
-    };
-
     return TodosView2;
 
   })(BaseView);
@@ -107,16 +128,13 @@
       }
     };
 
-    TodoView.prototype.process = function() {
+    TodoView.prototype.template = function() {
       var self;
       self = this;
       return [
-        'li', {
-          "class": (this.todo.completed ? 'completed' : void 0),
-          afterRender: function(el) {
-            return self.el = $(el);
-          }
-        }, [
+        'li', this.data.todo.completed ? {
+          "class": 'completed'
+        } : void 0, [
           '.view', {
             dblclick: function() {
               self.el.addClass('editing');
@@ -125,12 +143,12 @@
           }, [
             "input.toggle", {
               type: 'checkbox',
-              checked: (this.todo.completed ? 'checked' : void 0),
+              checked: (this.data.todo.completed ? 'checked' : void 0),
               click: function() {
                 return self.data.todo.completed = !self.data.todo.completed;
               }
             }
-          ], ['label', this.todo.title], [
+          ], ['label', this.data.todo.title], [
             'button.destroy', {
               click: function() {
                 return self.data.todos.splice(self.data.todos.indexOf(self.data.todo), 1);
@@ -174,7 +192,7 @@
     }
 
     TodosChildrenView.prototype.initialize = function() {
-      this.todos.subscribe(CHANGED, (function(_this) {
+      this.data.todos.subscribe(CHANGED, (function(_this) {
         return function() {
           return T(_this.process()).render({
             replace: _this.el
@@ -191,21 +209,16 @@
       })(this));
     };
 
-    TodosChildrenView.prototype.process = function() {
-      var self, todo;
-      self = this;
+    TodosChildrenView.prototype.template = function() {
+      var todo;
       return [
-        'ul#todo-list', {
-          afterRender: function(el) {
-            return self.el = $(el);
-          }
-        }, (function() {
+        'ul#todo-list', (function() {
           var _i, _len, _ref, _results;
           _ref = this.data.todos.children();
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             todo = _ref[_i];
-            if ((this.data.filter === 'active' && todo.completed) || (this.filter === 'completed' && !todo.completed)) {
+            if ((this.data.filter === 'active' && todo.completed) || (this.data.filter === 'completed' && !todo.completed)) {
               continue;
             }
             _results.push(new TodoView({
@@ -230,6 +243,13 @@
     }
 
     TodosFooterView.prototype.initialize = function() {
+      this.data.todos.subscribe(CHANGED, (function(_this) {
+        return function() {
+          return T(_this.process()).render({
+            replace: _this.el
+          });
+        };
+      })(this));
       return Busbup.subscribe(FILTER, (function(_this) {
         return function(_, filter) {
           return _this.data.filter = filter;
@@ -255,7 +275,7 @@
       ];
     };
 
-    TodosFooterView.prototype.process = function() {
+    TodosFooterView.prototype.template = function() {
       var filter, self;
       self = this;
       return [
@@ -283,7 +303,7 @@
             return _results;
           }).call(this)
         ], [
-          'button#clear-completed', this.todos.completed() === 0 ? {
+          'button#clear-completed', this.data.todos.completed() === 0 ? {
             style: {
               display: 'none'
             }
@@ -318,16 +338,9 @@
       })(this));
     };
 
-    FooterFilterLink.prototype.process = function() {
-      var self;
-      self = this;
+    FooterFilterLink.prototype.template = function() {
       return [
-        'li', {
-          afterRender: function(el) {
-            return self.el = $(el);
-          },
-          "class": this.data.name
-        }, [
+        "li." + this.data.name, [
           'a', this.data.selected ? {
             "class": 'selected'
           } : void 0, {

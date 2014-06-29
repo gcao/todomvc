@@ -105,7 +105,7 @@ internal.TemplateOutput.prototype.render = (options) ->
   internal.registerCallbacks()
 
 internal.FIRST_NO_PROCESS_PATTERN = /^<.*/
-internal.FIRST_FIELD_PATTERN      = /^([^#.]+)?(#([^.]+))?(.(.*))?$/
+internal.FIRST_FIELD_PATTERN      = /^([^#.]+)?(#([^.]+))?(\..*)?$/
 
 # Parse first item and add parsed data to array
 internal.processFirst = (items) ->
@@ -133,12 +133,17 @@ internal.processFirst = (items) ->
   if matches = first.match(internal.FIRST_FIELD_PATTERN)
     tag     = matches[1] || 'div'
     id      = matches[3]
-    classes = matches[5]
+    classes = matches[4]
+    classes = classes.replace(/\.+/g, ' ').trim() if classes
     if id or classes
       attrs = {}
       attrs.id    = id if id
-      attrs.class = classes.replace(/\./g, ' ') if classes
+      attrs.class = classes if classes
       items.splice 0, 1, tag, attrs
+    else
+      items[0] = tag
+  else
+    throw "Invalid first field: #{first}, must match tag#id.class1.class2"
 
   items
 
@@ -152,7 +157,7 @@ internal.normalize = (items) ->
     if items.length is 0
       return ''
   else
-    return items 
+    return items
 
   for i in [items.length - 1..0]
     item = internal.normalize items[i]

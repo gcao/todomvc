@@ -108,6 +108,13 @@
     function TodosFooterView(todos, filter) {
       this.todos = todos;
       this.filter = filter;
+      this.todos.subscribe(CHANGED, (function(_this) {
+        return function() {
+          return T(_this.process()).render({
+            replace: _this.el
+          });
+        };
+      })(this));
       Busbup.subscribe(FILTER, (function(_this) {
         return function(_, filter) {
           return _this.filter = filter;
@@ -137,7 +144,11 @@
       var filter, self;
       self = this;
       return [
-        'footer#footer', this.todos.length() === 0 ? {
+        'footer#footer', {
+          afterRender: function(el) {
+            return self.el = $(el);
+          }
+        }, this.todos.length() === 0 ? {
           style: {
             display: 'none'
           }
