@@ -1,4 +1,4 @@
-class BaseView
+class Widget
   constructor: (@data, @children...) ->
     @isWidget = true
     @initialize()
@@ -21,10 +21,19 @@ class BaseView
 
     result
 
+  update: =>
+    T(@process()).render replace: @el
+
   render: (args...) ->
     T(@process()).render args...
 
-class @TodosView2 extends BaseView
+  @create: (props) ->
+    class Child extends @
+    Child.prototype[k] = v for k, v of props
+    (data, children...) ->
+      new Child(data, children...)
+
+@TodosView2 = Widget.create
   template: ->
     self = @
     [ 'header#header'
@@ -48,17 +57,15 @@ class @TodosView2 extends BaseView
           for: 'toggle-all'
           'Mark all as complete'
         ]
-        new TodosChildrenView(todos: @data.todos, filter: @data.filter).process()
-        #TodosChildrenView(todos: @data.todos, filter: @data.filter)
+        TodosChildrenView(todos: @data.todos, filter: @data.filter)
       ]
 
-      new TodosFooterView(todos: @data.todos, filter: @data.filter).process()
+      TodosFooterView(todos: @data.todos, filter: @data.filter)
     ]
 
-class TodoView extends BaseView
+TodoView = Widget.create
   initialize: ->
-    @data.todo.subscribe CHANGED, =>
-      T(@process()).render replace: @el
+    @data.todo.subscribe CHANGED, @update
 
   close: ->
     return if not @el.hasClass('editing')
@@ -99,14 +106,13 @@ class TodoView extends BaseView
       ]
     ]
 
-class TodosChildrenView extends BaseView
+TodosChildrenView = Widget.create
   initialize: ->
-    @data.todos.subscribe CHANGED, =>
-      T(@process()).render replace: @el
+    @data.todos.subscribe CHANGED, @update
 
     Busbup.subscribe FILTER, (_, filter) =>
       @data.filter = filter
-      T(@process()).render replace: @el
+      @update()
 
   template: ->
     [ 'ul#todo-list'
@@ -114,13 +120,12 @@ class TodosChildrenView extends BaseView
         if (@data.filter is 'active' and todo.completed) or (@data.filter is 'completed' and not todo.completed)
           continue
 
-        new TodoView(todos: @data.todos, todo: todo).process()
+        TodoView(todos: @data.todos, todo: todo)
     ]
 
-class TodosFooterView extends BaseView
+TodosFooterView = Widget.create
   initialize: ->
-    @data.todos.subscribe CHANGED, =>
-      T(@process()).render replace: @el
+    @data.todos.subscribe CHANGED, @update
 
     Busbup.subscribe FILTER, (_, filter) =>
       @data.filter = filter
@@ -156,7 +161,7 @@ class TodosFooterView extends BaseView
         " left"
       ]
       [ 'ul#filters'
-        new FooterFilterLink(filter).process() for filter in @filters()
+        FooterFilterLink(filter) for filter in @filters()
       ]
       [ 'button#clear-completed'
         if @data.todos.completed() is 0
@@ -170,11 +175,11 @@ class TodosFooterView extends BaseView
       ]
     ]
 
-class FooterFilterLink extends BaseView
+FooterFilterLink = Widget.create
   initialize: ->
     Busbup.subscribe FILTER, (_, filter) =>
       @data.selected = filter is @data.name
-      T(@process()).render replace: @el
+      @update()
 
   template: ->
     [ "li.#{@data.name}"
