@@ -65,6 +65,23 @@ class Widget
       TodosFooterView(todos: @data.todos, filter: @data.filter).process()
     ]
 
+TodosChildrenView = Widget.create
+  initialize: ->
+    @data.todos.subscribe CHANGED, @update
+
+    Busbup.subscribe FILTER, (_, filter) =>
+      @data.filter = filter
+      @update()
+
+  template: ->
+    [ 'ul#todo-list'
+      for todo in @data.todos.children()
+        if (@data.filter is 'active' and todo.completed) or (@data.filter is 'completed' and not todo.completed)
+          continue
+
+        TodoView(todos: @data.todos, todo: todo).process()
+    ]
+
 TodoView = Widget.create
   initialize: ->
     @data.todo.subscribe CHANGED, @update
@@ -108,23 +125,6 @@ TodoView = Widget.create
       ]
     ]
 
-TodosChildrenView = Widget.create
-  initialize: ->
-    @data.todos.subscribe CHANGED, @update
-
-    Busbup.subscribe FILTER, (_, filter) =>
-      @data.filter = filter
-      @update()
-
-  template: ->
-    [ 'ul#todo-list'
-      for todo in @data.todos.children()
-        if (@data.filter is 'active' and todo.completed) or (@data.filter is 'completed' and not todo.completed)
-          continue
-
-        TodoView(todos: @data.todos, todo: todo).process()
-    ]
-
 TodosFooterView = Widget.create
   initialize: ->
     @data.todos.subscribe CHANGED, @update
@@ -163,9 +163,8 @@ TodosFooterView = Widget.create
         " left"
       ]
       [ 'ul#filters'
-        #FooterFilterLink(filter).process() for filter in @filters()
         for filter in @filters()
-          Widget.inline filter, 
+          Widget.inline filter,
             initialize: ->
               Busbup.subscribe FILTER, (_, filter) =>
                 @data.selected = filter is @data.name
@@ -173,7 +172,7 @@ TodosFooterView = Widget.create
 
             template: ->
               [ "li.#{@data.name}"
-                [ 'a'
+                [ "a"
                   class: 'selected' if @data.selected
                   href: "#/#{@data.name}"
                   @data.label
@@ -191,19 +190,4 @@ TodosFooterView = Widget.create
         ]
       ]
     ]
-
-#FooterFilterLink = Widget.create
-#  initialize: ->
-#    Busbup.subscribe FILTER, (_, filter) =>
-#      @data.selected = filter is @data.name
-#      @update()
-
-#  template: ->
-#    [ "li.#{@data.name}"
-#      [ 'a'
-#        class: 'selected' if @data.selected
-#        href: "#/#{@data.name}"
-#        @data.label
-#      ]
-#    ]
 

@@ -130,6 +130,39 @@
     }
   });
 
+  TodosChildrenView = Widget.create({
+    initialize: function() {
+      this.data.todos.subscribe(CHANGED, this.update);
+      return Busbup.subscribe(FILTER, (function(_this) {
+        return function(_, filter) {
+          _this.data.filter = filter;
+          return _this.update();
+        };
+      })(this));
+    },
+    template: function() {
+      var todo;
+      return [
+        'ul#todo-list', (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.data.todos.children();
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            todo = _ref[_i];
+            if ((this.data.filter === 'active' && todo.completed) || (this.data.filter === 'completed' && !todo.completed)) {
+              continue;
+            }
+            _results.push(TodoView({
+              todos: this.data.todos,
+              todo: todo
+            }).process());
+          }
+          return _results;
+        }).call(this)
+      ];
+    }
+  });
+
   TodoView = Widget.create({
     initialize: function() {
       return this.data.todo.subscribe(CHANGED, this.update);
@@ -197,39 +230,6 @@
     }
   });
 
-  TodosChildrenView = Widget.create({
-    initialize: function() {
-      this.data.todos.subscribe(CHANGED, this.update);
-      return Busbup.subscribe(FILTER, (function(_this) {
-        return function(_, filter) {
-          _this.data.filter = filter;
-          return _this.update();
-        };
-      })(this));
-    },
-    template: function() {
-      var todo;
-      return [
-        'ul#todo-list', (function() {
-          var _i, _len, _ref, _results;
-          _ref = this.data.todos.children();
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            todo = _ref[_i];
-            if ((this.data.filter === 'active' && todo.completed) || (this.data.filter === 'completed' && !todo.completed)) {
-              continue;
-            }
-            _results.push(TodoView({
-              todos: this.data.todos,
-              todo: todo
-            }).process());
-          }
-          return _results;
-        }).call(this)
-      ];
-    }
-  });
-
   TodosFooterView = Widget.create({
     initialize: function() {
       this.data.todos.subscribe(CHANGED, this.update);
@@ -291,7 +291,7 @@
                 template: function() {
                   return [
                     "li." + this.data.name, [
-                      'a', this.data.selected ? {
+                      "a", this.data.selected ? {
                         "class": 'selected'
                       } : void 0, {
                         href: "#/" + this.data.name
