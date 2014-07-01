@@ -22,7 +22,7 @@
     if (todosView) {
       return Busbup.publish(FILTER, filter);
     } else {
-      todosView = new TodosView2({
+      todosView = TodosView2({
         todos: todos,
         filter: filter
       });
