@@ -1,40 +1,3 @@
-class Widget
-  constructor: (@data, @children...) ->
-    @isWidget = true
-    @initialize()
-
-  initialize: ->
-
-  process: ->
-    self = @
-    result = @template()
-
-    # Add afterRender callback to set @el
-    callback = (el) -> self.el = el
-    if result[1]and typeof result[1] is "object" and (result[1] not instanceof Array)
-      if result[1].afterRender
-        result[1].afterRender.unshift callback
-      else
-        result[1].afterRender = callback
-    else
-      result.splice(1, 0, afterRender: callback)
-
-    result
-
-  update: =>
-    T(@process()).render replace: @el
-
-  render: (args...) ->
-    T(@process()).render args...
-
-  @create: (props) ->
-    class Child extends @
-    Child.prototype[k] = v for k, v of props
-    (data, children...) -> new Child(data, children...)
-
-  @inline: (data, widgetProps) ->
-    @create(widgetProps)(data).process()
-
 @TodosView2 = Widget.create
   template: ->
     self = @
@@ -59,10 +22,10 @@ class Widget
           for: 'toggle-all'
           'Mark all as complete'
         ]
-        TodosChildrenView(todos: @data.todos, filter: @data.filter).process()
+        TodosChildrenView(todos: @data.todos, filter: @data.filter)
       ]
 
-      TodosFooterView(todos: @data.todos, filter: @data.filter).process()
+      TodosFooterView(todos: @data.todos, filter: @data.filter)
     ]
 
 TodosChildrenView = Widget.create
@@ -79,7 +42,7 @@ TodosChildrenView = Widget.create
         if (@data.filter is 'active' and todo.completed) or (@data.filter is 'completed' and not todo.completed)
           continue
 
-        TodoView(todos: @data.todos, todo: todo).process()
+        TodoView(todos: @data.todos, todo: todo)
     ]
 
 TodoView = Widget.create

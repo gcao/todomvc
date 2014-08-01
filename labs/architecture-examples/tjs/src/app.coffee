@@ -14,8 +14,7 @@ showTodos = (todos, filter) ->
     Busbup.publish FILTER, filter
   else
     #todosView = new TodosView(todos, filter)
-    todosView = TodosView2 todos: todos, filter: filter
-    todosView.render inside: '#todoapp'
+    TodosView2(todos: todos, filter: filter).render inside: '#todoapp'
 
 isValidFilter = (filter) ->
   ['all', 'active', 'completed'].indexOf(filter) >= 0

@@ -22,11 +22,10 @@
     if (todosView) {
       return Busbup.publish(FILTER, filter);
     } else {
-      todosView = TodosView2({
+      return TodosView2({
         todos: todos,
         filter: filter
-      });
-      return todosView.render({
+      }).render({
         inside: '#todoapp'
       });
     }
