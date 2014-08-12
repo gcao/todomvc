@@ -5,15 +5,13 @@
   todos = void 0;
 
   getTodos = function() {
-    if (todos) {
-      return todos;
-    } else {
-      todos = FreeMart.request('todos:load', 'todos');
+    if (!todos) {
+      todos = TodosResource.load('todos');
       todos.subscribe(CHANGED, function() {
-        return FreeMart.request('todos:save', 'todos', todos);
+        return TodosResource.save('todos', todos);
       });
-      return todos;
     }
+    return todos;
   };
 
   todosView = void 0;
@@ -22,10 +20,11 @@
     if (todosView) {
       return Busbup.publish(FILTER, filter);
     } else {
-      return TodosView2({
+      todosView = TodosView({
         todos: todos,
         filter: filter
-      }).render({
+      });
+      return todosView.render({
         inside: '#todoapp'
       });
     }
@@ -35,11 +34,15 @@
     return ['all', 'active', 'completed'].indexOf(filter) >= 0;
   };
 
-  FreeMart.register('/', function() {
+  router = new routes();
+
+  router.get('/', function() {
     return showTodos(getTodos(), 'all');
   });
 
-  FreeMart.register('/:filter', function(_, filter) {
+  router.get('/:filter', function(req) {
+    var filter;
+    filter = req.params.filter;
     if (isValidFilter(filter)) {
       return showTodos(getTodos(), filter);
     } else {
@@ -47,26 +50,8 @@
     }
   });
 
-  FreeMart.register(/\/.*/, function(options) {
-    var result;
-    console.log("Before " + options.$key);
-    result = FreeMart.request.apply(FreeMart, arguments);
-    console.log(" After " + options.$key);
-    return result;
-  });
-
-  router = new routes();
-
-  router.get('/', function() {
-    return FreeMart.request('/');
-  });
-
-  router.get('/:filter', function(req) {
-    return FreeMart.request('/:filter', req.params.filter);
-  });
-
   if (location.hash === "") {
-    FreeMart.request('/');
+    window.location.hash = "#/";
   }
 
 }).call(this);

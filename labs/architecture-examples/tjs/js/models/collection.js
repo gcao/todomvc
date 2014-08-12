@@ -31,10 +31,10 @@
     for (_i = 0, _len = methods.length; _i < _len; _i++) {
       method = methods[_i];
       if (['constructor', 'length'].indexOf(method) < 0) {
-        (function(m) {
-          return self.prototype[m] = function() {
+        (function(method) {
+          return self.prototype[method] = function() {
             var _ref;
-            return (_ref = this._data)[m].apply(_ref, arguments);
+            return (_ref = this._data)[method].apply(_ref, arguments);
           };
         })(method);
       }

@@ -40,12 +40,4 @@
 
   })();
 
-  FreeMart.register('todos:load', function(_, id) {
-    return TodosResource.load(id);
-  });
-
-  FreeMart.register('todos:save', function(_, id, todos) {
-    return TodosResource.save(id, todos);
-  });
-
 }).call(this);

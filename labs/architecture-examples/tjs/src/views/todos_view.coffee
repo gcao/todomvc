@@ -1,4 +1,4 @@
-@TodosView2 = Widget.create
+@TodosView = Widget.create
   template: ->
     self = @
     [ 'header#header'
