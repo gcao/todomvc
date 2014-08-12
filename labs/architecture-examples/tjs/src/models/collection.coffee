@@ -13,7 +13,6 @@ class @Collection
   methods = Object.getOwnPropertyNames(Array.prototype)
   for method in methods
     if ['constructor', 'length'].indexOf(method) < 0
-      ((m) -> 
-        self.prototype[m] = -> @_data[m] arguments...
-      )(method)
+      do (method) -> 
+        self.prototype[method] = -> @_data[method] arguments...
 

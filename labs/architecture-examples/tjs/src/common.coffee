@@ -5,10 +5,3 @@
 @CHANGED   = 'changed'
 @FILTER    = 'filter'
 
-run = ->
-  func = arguments[arguments.length - 1]
-  func.apply(func, arguments)
-
-#run 1, 2, (a, b, self) ->
-#  console.log a, b, self
-
